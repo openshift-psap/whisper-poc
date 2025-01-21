@@ -1,0 +1,20 @@
+FROM nvcr.io/nvidia/tritonserver:24.11-trtllm-python-py3 AS base
+ARG UNAME=trt
+## Install packages required for bench
+RUN apt-get update -y \
+    && apt-get install -y ccache curl wget jq sudo
+RUN useradd --uid 2000 --gid 0 ${UNAME}
+# Switch to the custom user
+USER ${UNAME}
+WORKDIR /home/${UNAME}
+RUN pip3 install -U transformers
+RUN git clone https://github.com/triton-inference-server/tensorrtllm_backend.git && \
+    git lfs install
+WORKDIR /home/${UNAME}/tensorrtllm_backend
+RUN git checkout v0.16.0 && \
+    git submodule update --init --recursive
+RUN pip install -r tensorrt_llm/examples/whisper/requirements.txt && \
+    pip install -r requirements.txt
+WORKDIR /home/${UNAME}
+COPY requirements.txt .
+RUN pip install -r requirements.txt
