@@ -66,3 +66,22 @@ Requests per second: 4.217996337181559 for 3329
 
 
 ### TensorRT-LLM
+- Connect to the TensorRT-LLM container with 
+
+```
+oc exec -n my-whisper-runtime -it trt-standalone -- /bin/bash
+```
+
+In the container, build the model:
+```
+bash scripts/trt-build-whisper.sh
+```
+
+And start the Triton inference server:
+```
+source ~/scripts/trt-whisper-vars.sh
+cd ~/tensorrtllm_backend
+python3 scripts/launch_triton_server.py --world_size 1 --model_repo=model_repo_whisper/ --tensorrt_llm_model_name tensorrt_llm,whisper_bls --multimodal_gpu0_cuda_mem_pool_bytes 300000000
+```
+
+TODO: Add steps for benchmarking
