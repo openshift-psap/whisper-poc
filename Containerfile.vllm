@@ -74,3 +74,5 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 RUN uv pip install vllm --pre --extra-index-url https://wheels.vllm.ai/nightly
 
 RUN pip install -r requirements.txt
+
+COPY ./scripts ./scripts

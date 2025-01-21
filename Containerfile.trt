@@ -18,3 +18,5 @@ RUN pip install -r tensorrt_llm/examples/whisper/requirements.txt && \
 WORKDIR /home/${UNAME}
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+
+COPY ./scripts ./scripts
