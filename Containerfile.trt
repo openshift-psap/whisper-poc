@@ -1,5 +1,7 @@
-FROM nvcr.io/nvidia/tritonserver:24.11-trtllm-python-py3 AS base
+FROM nvcr.io/nvidia/tritonserver:24.12-trtllm-python-py3 AS base
+
 ARG UNAME=trt
+
 ## Install packages required for bench
 RUN apt-get update -y \
     && apt-get install -y ccache curl wget jq sudo
@@ -13,10 +15,17 @@ RUN git clone https://github.com/triton-inference-server/tensorrtllm_backend.git
 WORKDIR /home/${UNAME}/tensorrtllm_backend
 RUN git checkout v0.16.0 && \
     git submodule update --init --recursive
-RUN pip install -r tensorrt_llm/examples/whisper/requirements.txt && \
-    pip install -r requirements.txt
+
+#RUN pip install -r tensorrt_llm/examples/whisper/requirements.txt && \
+#    pip install -r requirements.txt
+# If you pip install using the above requirements file, pip crashes trying to re-install dependencies of the already installed tensorrt_llm v0.16
+
+RUN pip install tiktoken datasets kaldialign openai-whisper librosa soundfile safetensors transformers janus regex fire tritonclient pandas tabulate
+
 WORKDIR /home/${UNAME}
+
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY ./scripts ./scripts
+COPY --chown=${UNAME}  ./scripts ./scripts
+

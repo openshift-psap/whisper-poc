@@ -19,8 +19,12 @@ spec:
     resources:
       limits:
         nvidia.com/gpu: 1  # Request 1 GPU
-  tolerations:
-    - key: nvidia.com/gpu
-      operator: Exists
-      effect: NoSchedule  # Ensure the pod is scheduled on GPU nodes
+    volumeMounts:
+    - name: shared-memory
+      mountPath: /dev/shm
+  volumes:
+  - name: shared-memory
+    emptyDir:
+      medium: Memory
+      sizeLimit: 32Gi
 EOF
