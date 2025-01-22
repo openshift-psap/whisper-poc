@@ -84,4 +84,22 @@ cd ~/tensorrtllm_backend
 python3 scripts/launch_triton_server.py --world_size 1 --model_repo=model_repo_whisper/ --tensorrt_llm_model_name tensorrt_llm,whisper_bls --multimodal_gpu0_cuda_mem_pool_bytes 300000000
 ```
 
-TODO: Add steps for benchmarking
+Alternatively, to do offline inference (don't need to run triton server for this):
+```
+source ~/scripts/trt-whisper-vars.sh
+cd ~/tensorrtllm_backend/tensort_llm/examples/whisper
+python3 run.py --engine_dir $output_dir --dataset hf-internal-testing/librispeech_asr_dummy --enable_warmup --name librispeech_dummy_large_v3 --assets_dir ~/assets
+```
+
+# For MLCommons/peoples_speech you may need to add a line to run.py to filter out the longer sequences
+```
+dataset = dataset.filter(lambda example: example['duration_ms'] < 30000 and example['duration_ms'] > 10000)
+```
+
+Then you can run:
+```
+python3 run.py --engine_dir $output_dir --dataset MLCommons/peoples_speech --dataset_name microset --enable_warmup --name peoples_speech --dataset_split train --assets_dir ~/assets  --batch_size 64
+
+# for bigger dataset 
+python3 run.py --engine_dir $output_dir --dataset MLCommons/peoples_speech --dataset_name validation --dataset_split validation --enable_warmup --name peoples_speech --assets_dir ~/assets --batch_size 64
+```
