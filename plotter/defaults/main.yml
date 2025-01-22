@@ -1,0 +1,4 @@
+---
+# defaults file for plotter
+
+csv_file_path: whisper_bench-output/gpu_metrics.csv
