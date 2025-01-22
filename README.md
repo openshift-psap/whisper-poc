@@ -66,3 +66,14 @@ Requests per second: 4.217996337181559 for 3329
 
 
 ### TensorRT-LLM
+
+
+
+## Ansible role
+
+```
+python3 -m pip install -r whisper_bench-requirements.txt
+ansible-galaxy collection install -r whisper_bench-requirements.yml
+export KUBECONFIG=/path/to/custom/kubeconfig
+ansible-playbook whisper_bench.yml
+```

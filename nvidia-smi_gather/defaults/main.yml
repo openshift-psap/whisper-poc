@@ -1,0 +1,14 @@
+---
+# defaults file for nvidia-smi_gather
+
+dcgm_namespace: "nvidia-gpu-operator"         # Namespace where DCGM pod is located
+dcgm_pod_label: "nvidia-dcgm-exporter"        # Label or prefix of the DCGM pod
+container_name_suffix: "nvidia-dcgm-exporter" # DCGM container name suffix
+monitor_interval: 1                    # Time in seconds between nvidia-smi captures
+
+container_output_file: "/tmp/gpu_metrics.csv"
+local_output_file: "./whisper_bench-output/gpu_metrics.csv"
+output_folder_path: "./whisper_bench-output"
+
+command_pod_namespace: "my-whisper-runtime" # Namespace of the monitored command pod
+command_pod_name: "vllm-standalone"    # Name of the monitored command pod

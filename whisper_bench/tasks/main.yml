@@ -1,0 +1,138 @@
+---
+# tasks/main.yml
+
+- name: Ensure namespace exists
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: my-whisper-runtime
+
+- name: Delete the existing pod (if it exists)
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Pod
+    name: vllm-standalone
+    namespace: my-whisper-runtime
+  ignore_errors: true
+
+- name: Wait for the pod to be deleted
+  kubernetes.core.k8s_info:
+    kind: Pod
+    name: vllm-standalone
+    namespace: my-whisper-runtime
+  register: pod_info
+  retries: 30
+  delay: 5
+  until: pod_info.resources | length == 0
+  ignore_errors: false
+
+- name: Validate the pod does not exist
+  assert:
+    that:
+      - pod_info.resources | length == 0
+    msg: "The pod vllm-standalone still exists in the namespace my-whisper-runtime"
+
+- name: Get nodes and debug the output
+  kubernetes.core.k8s_info:
+    kind: Node
+  register: k8s_get_nodes_result
+
+- name: Debug the nodes output
+  ansible.builtin.debug:
+    var: k8s_get_nodes_result
+
+- name: Create a Pod using Kubernetes Ansible collection
+  kubernetes.core.k8s:
+    state: present
+    api_version: v1
+    kind: Pod
+    name: vllm-standalone
+    namespace: my-whisper-runtime
+    definition:
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: vllm-standalone
+        namespace: my-whisper-runtime
+      spec:
+        containers:
+          - name: vllm-standalone
+            image: quay.io/psap/whisper-poc:latest-vllm
+            imagePullPolicy: Always
+            command:
+              - bash
+              - -c
+            args:
+              - |
+                sleep infinity
+            resources:
+              limits:
+                nvidia.com/gpu: 1
+        tolerations:
+          - key: nvidia.com/gpu
+            operator: Exists
+            effect: NoSchedule
+
+- name: Wait for the pod to exist
+  kubernetes.core.k8s_info:
+    kind: Pod
+    name: vllm-standalone
+    namespace: my-whisper-runtime
+  register: pod_info
+  retries: 30
+  delay: 5
+  until: pod_info.resources | length > 0  # Check if the pod exists
+  ignore_errors: false
+
+- name: Wait for the pod to be Running
+  kubernetes.core.k8s_info:
+    kind: Pod
+    name: vllm-standalone
+    namespace: my-whisper-runtime
+  register: pod_status
+  retries: 30
+  delay: 5
+  until: pod_status.resources[0].status.phase == "Running"
+  ignore_errors: false
+
+- name: Execute commands in the pod
+  kubernetes.core.k8s_exec:
+    namespace: my-whisper-runtime
+    pod: vllm-standalone
+    container: vllm-standalone
+    command: "bash -c '{{ item }}'"
+  loop: "{{ commands_to_run }}"
+  register: command_results
+  ignore_errors: false
+
+- name: Debug command results
+  debug:
+    msg: "{{ command_results.results }}"
+
+- name: Ensure the local output folder exists
+  file:
+    path: "{{ output_folder_path }}"
+    state: directory
+
+- name: Fetch output file from the pod using oc cp
+  shell: |
+    oc cp my-whisper-runtime/vllm-standalone:{{ results_folder_path }} {{ output_folder_path }}
+  register: fetch_result
+
+- name: Debug fetch result
+  debug:
+    msg: "{{ fetch_result.stdout }}"
+
+- name: Clean up Pod
+  kubernetes.core.k8s:
+    state: absent
+    definition:
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: vllm-standalone
+        namespace: my-whisper-runtime

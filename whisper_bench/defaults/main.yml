@@ -1,0 +1,12 @@
+---
+# defaults file for whisper_bench
+namespace: my-whisper-runtime
+pod_name: vllm-standalone
+container_name: vllm-standalone
+image: quay.io/psap/whisper-poc:latest-vllm
+commands_to_run:
+  - "mkdir -p /tmp/output/"
+  - "nvidia-smi > /tmp/output/gpu_status.txt"
+  - "python /workspace/scripts/run_vllm.py > /tmp/output/whisper.txt"
+results_folder_path: "/tmp/output"
+output_folder_path: "./whisper_bench-output"

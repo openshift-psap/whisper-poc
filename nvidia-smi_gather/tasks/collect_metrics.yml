@@ -1,0 +1,60 @@
+---
+- name: 'collect_metrics: Find the DCGM pod name'
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ dcgm_namespace }}"
+    label_selectors:
+      - "app={{ dcgm_pod_label }}"
+  register: dcgm_pod_info
+
+- name: 'collect_metrics: Ensure a DCGM pod is found'
+  fail:
+    msg: "No DCGM pod found in the namespace {{ dcgm_namespace }} with the label {{ dcgm_pod_label }}."
+  when: dcgm_pod_info.resources | length == 0
+
+- name: 'collect_metrics: Debug DCGM pod containers'
+  debug:
+    var: dcgm_pod_info.resources[0].spec.containers
+
+- name: 'collect_metrics: Set the DCGM pod and container name'
+  set_fact:
+    dcgm_pod_name: "{{ dcgm_pod_info.resources[0].metadata.name }}"
+    dcgm_container_name: >-
+      {{ (dcgm_pod_info.resources[0].spec.containers | selectattr('name', 'search', '^nvidia-dcgm-exporter$') | first | default({})).name | default('') }}
+
+- name: 'collect_metrics: Fail if no matching container is found'
+  fail:
+    msg: "No container named 'nvidia-dcgm-exporter' found in the DCGM pod '{{ dcgm_pod_name }}'."
+  when: dcgm_container_name == ''
+
+- name: 'collect_metrics: Start collecting GPU metrics'
+  kubernetes.core.k8s_exec:
+    namespace: "{{ dcgm_namespace }}"
+    pod: "{{ dcgm_pod_name }}"
+    container: "{{ dcgm_container_name }}"
+    command: |
+      bash -c '
+        nvidia-smi --query-gpu=index,timestamp,utilization.gpu,utilization.memory,memory.total,memory.used --format=csv,nounits > {{ container_output_file }};
+      '
+  register: dcgm_init_task
+  ignore_errors: true
+
+- name: 'collect_metrics: Start collecting GPU metrics in background using shell'
+  shell: |
+    oc exec -n {{ dcgm_namespace }} {{ dcgm_pod_name }} -c {{ dcgm_container_name }} -- bash -c '
+      while true; do
+        nvidia-smi --query-gpu=index,timestamp,utilization.gpu,utilization.memory,memory.total,memory.used --format=csv,noheader,nounits >> {{ container_output_file }};
+        sleep {{ monitor_interval }};
+      done &'
+  register: dcgm_async_task
+  async: 3600  # Run for 1 hour or adjust as needed
+  poll: 0  # Don't wait for the task to finish, allow playbook to continue
+  ignore_errors: true
+
+- name: 'collect_metrics: Debug the async task result'
+  debug:
+    var: dcgm_async_task
+
+- name: 'collect_metrics: Save the DCGM async task ID'
+  set_fact:
+    dcgm_task_id: "{{ dcgm_async_task.ansible_job_id }}"

@@ -1,0 +1,16 @@
+---
+- name: Deploy the vLLM pod and benchmark whisper while gathering dcgm metrics
+  hosts: localhost
+  gather_facts: no
+  roles:
+    - role: nvidia-smi_gather
+      vars:
+        collect_metrics_enabled: true
+        stop_metrics_enabled: false
+
+    - role: whisper_bench
+
+    - role: nvidia-smi_gather
+      vars:
+        collect_metrics_enabled: false
+        stop_metrics_enabled: true
