@@ -1,2 +1,3 @@
 output
 whisper_bench-output
+plots/*.png

@@ -27,14 +27,14 @@
     msg: "No container named 'nvidia-dcgm-exporter' found in the DCGM pod '{{ dcgm_pod_name }}'."
   when: dcgm_container_name == ''
 
-- name: 'collect_metrics: Start collecting GPU metrics'
+- name: 'collect_metrics: Write the header for collecting GPU metrics'
   kubernetes.core.k8s_exec:
     namespace: "{{ dcgm_namespace }}"
     pod: "{{ dcgm_pod_name }}"
     container: "{{ dcgm_container_name }}"
     command: |
       bash -c '
-        nvidia-smi --query-gpu=index,timestamp,utilization.gpu,utilization.memory,memory.total,memory.used --format=csv,nounits > {{ container_output_file }};
+      echo "index,timestamp,utilization.gpu [%],utilization.memory [%],memory.total [MiB],memory.used [MiB],power.draw [W]" > {{ container_output_file }};
       '
   register: dcgm_init_task
   ignore_errors: true
@@ -43,7 +43,7 @@
   shell: |
     oc exec -n {{ dcgm_namespace }} {{ dcgm_pod_name }} -c {{ dcgm_container_name }} -- bash -c '
       while true; do
-        nvidia-smi --query-gpu=index,timestamp,utilization.gpu,utilization.memory,memory.total,memory.used --format=csv,noheader,nounits >> {{ container_output_file }};
+        nvidia-smi --query-gpu=index,timestamp,utilization.gpu,utilization.memory,memory.total,memory.used,power.draw --format=csv,noheader,nounits >> {{ container_output_file }};
         sleep {{ monitor_interval }};
       done &'
   register: dcgm_async_task

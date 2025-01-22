@@ -1,17 +1,28 @@
 import pandas as pd
 import plotly.express as px
 
-# Convert the data to a Pandas DataFrame
-from io import StringIO
+# Read the CSV file
+df = pd.read_csv('../whisper_bench-output/gpu_metrics.csv', parse_dates=['timestamp'])
 
-df = pd.read_csv(StringIO(data), parse_dates=['timestamp'])
+# Clean column names by stripping any leading/trailing spaces
 df.columns = df.columns.str.strip()
 
-# Create a plot
-fig = px.line(df, x='timestamp', y=['utilization.gpu [%]', 'utilization.memory [%]'], 
-              title="GPU and Memory Utilization Over Time", 
-              labels={'timestamp': 'Time', 'value': 'Utilization (%)'},
-              markers=True)
+# Define a dictionary to map each column to its respective filename
+plots = {
+    'utilization.gpu [%]': 'gpu_utilization_plot.png',
+    'utilization.memory [%]': 'memory_utilization_plot.png',
+    'power.draw [W]': 'power_draw_plot.png'
+}
 
-# Show the plot
-fig.show()
+# Create and save plots
+for column, filename in plots.items():
+    if column in df.columns:  # Ensure the column exists
+        fig = px.line(
+            df,
+            x='timestamp',
+            y=column,
+            title=f"{column} Over Time",
+            labels={'timestamp': 'Time', column: column},
+            markers=True
+        )
+        fig.write_image(filename)  # Save the plot as a PNG image
