@@ -37,13 +37,13 @@ To deploy the containers in a OCP cluster run (from the repository root folder):
 
 ### vLLM
 
-- Connect to the vLLM container with and run the evaluation script with `python /workspace/scripts/run_vllm.py`.
+Connect to the vLLM container with and run the evaluation script with `python /workspace/scripts/run_vllm.py`.
 
 ```
 oc exec -n my-whisper-runtime -it vllm-standalone -- /bin/bash
 ```
 
-- Run the script directly:
+Run the script directly:
 
 ```
 oc exec -n my-whisper-runtime -it vllm-standalone -- /bin/bash -c "python /workspace/scripts/run_vllm.py"
@@ -66,7 +66,7 @@ Requests per second: 4.217996337181559 for 3329
 
 ### TensorRT-LLM
 
-- Connect to the TensorRT-LLM container with 
+Connect to the TensorRT-LLM container with 
 
 ```
 oc exec -n my-whisper-runtime -it trt-standalone -- /bin/bash
@@ -116,3 +116,4 @@ python3 -m pip install -r whisper_bench-requirements.txt
 ansible-galaxy collection install -r whisper_bench-requirements.yml
 export KUBECONFIG=/path/to/custom/kubeconfig
 ansible-playbook whisper.yml
+```
