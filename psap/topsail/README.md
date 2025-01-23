@@ -1,4 +1,4 @@
-# Ansible Collection - psap.bench
+# Ansible Collection - psap.topsail
 
 Documentation for the collection.
 
@@ -7,7 +7,7 @@ Documentation for the collection.
 
 ```
 ansible-galaxy collection build --force
-ansible-galaxy collection install --force psap-bench-1.0.0.tar.gz
+ansible-galaxy collection install --force psap-topsail-1.0.0.tar.gz
 ```
 
 ## How to run the playbook

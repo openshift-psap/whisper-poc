@@ -1,3 +1,3 @@
-# Ansible Collection - psap.bench
+# Ansible Collection - psap.topsail
 
 Documentation for the collection.

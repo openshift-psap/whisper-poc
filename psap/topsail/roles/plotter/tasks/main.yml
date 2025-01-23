@@ -18,7 +18,7 @@
   when: not csv_file_stat.stat.exists
 
 - name: "main: Use custom plot module"
-  psap.bench.plotto:
+  psap.topsail.plotto:
     csv_file_path: "{{ csv_file_path }}"
 
 # - name: "main: Execute the Python script directly"
