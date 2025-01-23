@@ -13,14 +13,20 @@ Container images are published in
 
 ### Building TensorRT container
 
+From the repository root folder:
+
 ```
+cd containers
 podman build -f Containerfile.trt -t quay.io/psap/whisper-poc:latest-trt .
 podman push quay.io/psap/whisper-poc:latest-trt
 ```
 
 ### Building vLLM container
 
+From the repository root folder:
+
 ```
+cd containers
 podman build -f Containerfile.vllm -t quay.io/psap/whisper-poc:latest-vllm .
 podman push quay.io/psap/whisper-poc:latest-vllm
 ```
@@ -29,6 +35,7 @@ podman push quay.io/psap/whisper-poc:latest-vllm
 
 To deploy the containers in a OCP cluster run (from the repository root folder):
 
+- Go into the containers folder `cd containers`.
 - Run initial steps `./00_pre.sh`.
 - Deploy a TensorRT-LLM pod with `./01_pod.trt.sh` or
 - Deploy a vLLM pod with `./01_pod.vllm.sh`.
@@ -109,11 +116,21 @@ python3 run.py --engine_dir $output_dir --dataset MLCommons/peoples_speech --dat
 python3 run.py --engine_dir $output_dir --dataset MLCommons/peoples_speech --dataset_name validation --dataset_split validation --enable_warmup --name peoples_speech --assets_dir ~/assets --batch_size 64
 ```
 
-## Ansible role
+## Ansible collection
+
+From the root of the repository run:
+
+- Install the collection:
 
 ```
-python3 -m pip install -r whisper_bench-requirements.txt
-ansible-galaxy collection install -r whisper_bench-requirements.yml
-export KUBECONFIG=/path/to/custom/kubeconfig
-ansible-playbook whisper.yml
+cd psap/bench
+ansible-galaxy collection build --force --output-path releases/
+VERSION=$(grep '^version: ' ./galaxy.yml | awk '{print $2}')
+ansible-galaxy collection install releases/psap-bench-$VERSION.tar.gz --force
+```
+
+- Run the playbook:
+
+```
+ansible-playbook playbook.yml
 ```
