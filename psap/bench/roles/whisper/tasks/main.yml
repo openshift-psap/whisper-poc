@@ -1,6 +1,4 @@
 ---
-# tasks/main.yml
-
 - name: Ensure namespace exists
   kubernetes.core.k8s:
     state: present
@@ -31,7 +29,7 @@
   ignore_errors: false
 
 - name: Validate the pod does not exist
-  assert:
+  ansible.builtin.assert:
     that:
       - pod_info.resources | length == 0
     msg: "The pod vllm-standalone still exists in the namespace my-whisper-runtime"
@@ -110,21 +108,23 @@
   ignore_errors: false
 
 - name: Debug command results
-  debug:
+  ansible.builtin.debug:
     msg: "{{ command_results.results }}"
 
 - name: Ensure the local output folder exists
-  file:
+  ansible.builtin.file:
     path: "{{ output_folder_path }}"
     state: directory
 
 - name: Fetch output file from the pod using oc cp
-  shell: |
+  ansible.builtin.shell: |
     oc cp my-whisper-runtime/vllm-standalone:{{ results_folder_path }} {{ output_folder_path }}
   register: fetch_result
+  args:
+    executable: /bin/bash
 
 - name: Debug fetch result
-  debug:
+  ansible.builtin.debug:
     msg: "{{ fetch_result.stdout }}"
 
 - name: Clean up Pod

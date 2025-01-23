@@ -1,11 +1,13 @@
 ---
-- name: 'stop_metrics: Copy the metrics file from the container to the local system before stopping collection'
-  shell: >
+- name: "stop_metrics: Copy the metrics file from the container to the local system before stopping collection"
+  ansible.builtin.shell: >
     oc cp {{ dcgm_namespace }}/{{ dcgm_pod_name }}:{{ container_output_file }} {{ local_output_file }}
   register: copy_metrics_result
   ignore_errors: true
+  args:
+    executable: /bin/bash
 
-- name: 'stop_metrics: Delete the dcgm exporter pod to trigger a restart'
+- name: "stop_metrics: Delete the dcgm exporter pod to trigger a restart"
   kubernetes.core.k8s:
     namespace: "{{ dcgm_namespace }}"
     kind: Pod
@@ -14,17 +16,17 @@
   register: pod_delete_result
   ignore_errors: true
 
-- name: 'stop_metrics: Check if metrics output file exists'
-  stat:
+- name: "stop_metrics: Check if metrics output file exists"
+  ansible.builtin.stat:
     path: "{{ local_output_file }}"
   register: metrics_file_status
 
-- name: 'stop_metrics: Debug GPU metrics path'
-  debug:
+- name: "stop_metrics: Debug GPU metrics path"
+  ansible.builtin.debug:
     msg: "Metrics collected and saved to {{ local_output_file }}"
   when: metrics_file_status.stat.exists
 
-- name: 'stop_metrics: Warn if no metrics were collected'
-  debug:
+- name: "stop_metrics: Warn if no metrics were collected"
+  ansible.builtin.debug:
     msg: "No metrics file was found. Metrics collection might have failed."
   when: not metrics_file_status.stat.exists

@@ -1,8 +1,8 @@
 ---
-- name: Include collect metrics tasks
+- name: "main: Include collect metrics tasks"
   include_tasks: collect_metrics.yml
   when: collect_metrics_enabled | default(false)
 
-- name: Include stop metrics tasks
+- name: "main: Include stop metrics tasks"
   include_tasks: stop_metrics.yml
   when: stop_metrics_enabled | default(false)
