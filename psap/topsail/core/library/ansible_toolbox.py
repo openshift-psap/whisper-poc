@@ -13,8 +13,8 @@ import shlex
 import importlib
 import logging
 
-from projects.core.library import config
-TOPSAIL_DIR = pathlib.Path(config.__file__).parents[3]
+from core.library import config
+TOPSAIL_DIR = pathlib.Path(config.__file__).parents[2]
 
 class Toolbox:
     """
@@ -22,7 +22,8 @@ class Toolbox:
     """
 
     def __init__(self):
-        for toolbox_file in (TOPSAIL_DIR / "projects").glob("*/toolbox/*.py"):
+        print(TOPSAIL_DIR)
+        for toolbox_file in (TOPSAIL_DIR / "core").glob("*/toolbox/*.py"):
             if toolbox_file.name.startswith("."): continue
 
             project_toolbox_module = str(toolbox_file.relative_to(TOPSAIL_DIR).with_suffix("")).replace(os.path.sep, ".")
