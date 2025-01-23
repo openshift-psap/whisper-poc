@@ -123,10 +123,10 @@ From the root of the repository run:
 - Install the collection:
 
 ```
-cd psap/bench
+cd psap/topsail
 ansible-galaxy collection build --force --output-path releases/
 VERSION=$(grep '^version: ' ./galaxy.yml | awk '{print $2}')
-ansible-galaxy collection install releases/psap-bench-$VERSION.tar.gz --force
+ansible-galaxy collection install releases/psap-topsail-$VERSION.tar.gz --force
 ```
 
 - Run the playbook:
