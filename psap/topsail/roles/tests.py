@@ -13,7 +13,7 @@ class Tests:
 
     @AnsibleRole("tests")
     @AnsibleMappedParams
-    def main(self):
+    def whisper(self):
         """
         Run the tests role
         """
