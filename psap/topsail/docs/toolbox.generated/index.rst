@@ -78,6 +78,7 @@ Toolbox Documentation
 
                 
 * :doc:`main <Tests.main>`	 Run the tests role
+* :doc:`whisper <Tests.whisper>`	 Run the tests role
 
 ``whisper``
 ***********

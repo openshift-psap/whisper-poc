@@ -1,0 +1,4 @@
+---
+- name: Run whisper conditionally
+  include_tasks: "whisper.yml"
+  when: tests_test_name == "whisper"

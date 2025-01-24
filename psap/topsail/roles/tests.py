@@ -13,7 +13,23 @@ class Tests:
 
     @AnsibleRole("tests")
     @AnsibleMappedParams
-    def whisper(self):
+    def main(self,
+                    test_name="main",
+    ):
+        """
+        Run the tests role
+        """
+
+        # if runtime not in ("standalone-tgis", "vllm"):
+        #     raise ValueError(f"Unsupported runtime: {runtime}")
+
+        return RunAnsibleRole(locals())
+
+    @AnsibleRole("tests")
+    @AnsibleMappedParams
+    def whisper(self,
+                    test_name="whisper",
+    ):
         """
         Run the tests role
         """

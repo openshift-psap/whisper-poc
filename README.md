@@ -135,7 +135,7 @@ ansible-galaxy collection install releases/psap-topsail-$VERSION.tar.gz --force
 - Run the playbook:
 
 ```
-ansible-playbook whisper.yml
+ansible-playbook playbook_whisper.yml
 ```
 
 ## Equivalent executions
@@ -144,7 +144,7 @@ Example of how both CLIs should be aligned to run a specific role:
 
 ```
 # Running from the Ansible CLI
-ansible-playbook plotter.yml
+ansible-playbook playbook_plotter.yml
 
 # Running from the toolbox CLI
 ./run_toolbox.py plotter main
@@ -155,7 +155,7 @@ Example of how to run a playbook (End to End test scenario):
 
 ```
 # Running from the Ansible CLI
-ansible-playbook whisper.yml
+ansible-playbook playbook_whisper.yml
 
 # Running from the toolbox CLI
 ./run_toolbox.py tests whisper

@@ -225,13 +225,15 @@ class RunAnsibleRole:
         env["ANSIBLE_LIBRARY"] = os.pathsep.join(topsail_library_list)
         self.ansible_vars["library"] = env["ANSIBLE_LIBRARY"]
 
-
-
-
-
-
         # We configure the collections path dynamically
         current_collections_paths = []
+        # begin ccamacho:extra
+        user_collections_path = str(pathlib.Path.home() / '.ansible' / 'collections')
+        system_collections_path = '/usr/share/ansible/collections'
+        current_collections_paths.append(user_collections_path)
+        current_collections_paths.append(system_collections_path)
+        # end ccamacho:extra
+
         if (collect_path := env.get("ANSIBLE_COLLECTIONS_PATHS")) is not None:
             current_collections_paths.append(str(collect_path))
         for path in sys.path:

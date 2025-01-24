@@ -3,11 +3,11 @@
 ..
     _Auto-generated file, do not edit manually ...
     _Toolbox generate command: repo generate_toolbox_rst_documentation
-    _ Source component: Tests.main
+    _ Source component: Tests.whisper
 
 
-tests main
-==========
+tests whisper
+=============
 
 Run the tests role
 
@@ -22,5 +22,5 @@ Parameters
 
 * Missing documentation for test_name
 
-* default value: ``main``
+* default value: ``whisper``
 
