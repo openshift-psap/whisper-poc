@@ -144,7 +144,7 @@ Example of how both CLIs should be aligned.
 ansible-playbook plotter.yml
 
 # Running from the toolbox CLI
-
+./run_toolbox.py plotter main
 ```
 
 ## Documentation
