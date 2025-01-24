@@ -5,16 +5,16 @@
     namespace: "{{ smigather_dcgm_namespace }}"
     label_selectors:
       - "app={{ smigather_dcgm_pod_label }}"
-  register: dcgm_pod_info
+  register: smigather_dcgm_pod_info
 
 - name: "collect_metrics: Ensure a DCGM pod is found"
   ansible.builtin.fail:
     msg: "No DCGM pod found in the namespace {{ smigather_dcgm_namespace }} with the label {{ smigather_dcgm_pod_label }}."
-  when: dcgm_pod_info.resources | length == 0
+  when: smigather_dcgm_pod_info.resources | length == 0
 
 - name: "collect_metrics: Debug DCGM pod containers"
   ansible.builtin.debug:
-    var: dcgm_pod_info.resources[0].spec.containers
+    var: smigather_dcgm_pod_info.resources[0].spec.containers
 
 - name: "collect_metrics: Set the DCGM pod and container name"
   ansible.builtin.set_fact:

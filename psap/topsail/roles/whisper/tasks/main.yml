@@ -103,29 +103,29 @@
     pod: vllm-standalone
     container: vllm-standalone
     command: "bash -c '{{ item }}'"
-  loop: "{{ commands_to_run }}"
-  register: command_results
+  loop: "{{ whisper_commands_to_run }}"
+  register: whisper_command_results
   ignore_errors: false
 
 - name: Debug command results
   ansible.builtin.debug:
-    msg: "{{ command_results.results }}"
+    msg: "{{ whisper_command_results.results }}"
 
 - name: Ensure the local output folder exists
   ansible.builtin.file:
-    path: "{{ output_folder_path }}"
+    path: "{{ whisper_output_folder_path }}"
     state: directory
 
 - name: Fetch output file from the pod using oc cp
   ansible.builtin.shell: |
-    oc cp my-whisper-runtime/vllm-standalone:{{ results_folder_path }} {{ output_folder_path }}
-  register: fetch_result
+    oc cp my-whisper-runtime/vllm-standalone:{{ whisper_results_folder_path }} {{ whisper_output_folder_path }}
+  register: whisper_fetch_result
   args:
     executable: /bin/bash
 
 - name: Debug fetch result
   ansible.builtin.debug:
-    msg: "{{ fetch_result.stdout }}"
+    msg: "{{ whisper_fetch_result.stdout }}"
 
 - name: Clean up Pod
   kubernetes.core.k8s:
