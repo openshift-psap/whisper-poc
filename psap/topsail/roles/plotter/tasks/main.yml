@@ -18,7 +18,11 @@
   when: not csv_file_stat.stat.exists
 
 - name: "main: Use custom plot module"
-  psap.topsail.plotto:
+  # Ansible CLI
+  # psap.topsail.plotto:
+  # Toolbox CLI and Ansible CLI
+  # TODO: plotto should be in the plotter role and not in the collection root as is specific to a role
+  plotto:
     csv_file_path: "{{ csv_file_path }}"
 
 # - name: "main: Execute the Python script directly"

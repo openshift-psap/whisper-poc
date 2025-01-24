@@ -134,3 +134,19 @@ ansible-galaxy collection install releases/psap-topsail-$VERSION.tar.gz --force
 ```
 ansible-playbook playbook.yml
 ```
+
+## Equivalent executions
+
+Example of how both CLIs should be aligned.
+
+```
+# Running from the Ansible CLI
+ansible-playbook plotter.yml
+
+# Running from the toolbox CLI
+
+```
+
+## Documentation
+
+[Documentation site](https://openshift-psap.github.io/whisper-poc/)

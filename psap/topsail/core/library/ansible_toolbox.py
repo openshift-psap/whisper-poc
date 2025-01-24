@@ -200,10 +200,35 @@ class RunAnsibleRole:
         if current_roles_path := env.get("ANSIBLE_ROLES_PATH"):
             topsail_roles_list += [current_roles_path]
 
-        topsail_roles_list += [str(entry) for entry in (TOPSAIL_DIR / "projects").glob("*/toolbox")]
+        topsail_roles_list += [str(entry) for entry in (TOPSAIL_DIR).glob("roles")]
 
         env["ANSIBLE_ROLES_PATH"] = os.pathsep.join(topsail_roles_list)
         self.ansible_vars["roles_path"] = env["ANSIBLE_ROLES_PATH"]
+
+
+
+
+        # We configure the library path dynamically appending them to the defaults
+        topsail_library_list = []
+
+        # Check if there's an existing ANSIBLE_LIBRARY path in the environment
+        if current_library_path := env.get("ANSIBLE_LIBRARY"):
+            topsail_library_list += [current_library_path]
+
+        # Add the main plugins/modules folder in TOPSAIL_DIR
+        topsail_library_list += [str(TOPSAIL_DIR / "plugins/modules")]
+
+        # Add plugins/modules directories within roles in TOPSAIL_DIR
+        topsail_library_list += [str(entry) for entry in (TOPSAIL_DIR).glob("roles/*/plugins/modules")]
+
+        # Set the environment variable for ANSIBLE_LIBRARY
+        env["ANSIBLE_LIBRARY"] = os.pathsep.join(topsail_library_list)
+        self.ansible_vars["library"] = env["ANSIBLE_LIBRARY"]
+
+
+
+
+
 
         # We configure the collections path dynamically
         current_collections_paths = []

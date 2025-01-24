@@ -1,0 +1,7 @@
+---
+- name: Run the plotter role from the default tasks file (main.yml)
+  hosts: localhost
+  gather_facts: no
+  tasks:
+  - import_role:
+      name: psap.topsail.plotter
