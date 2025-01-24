@@ -9,12 +9,12 @@
 
 - name: "main: Ensure the CSV file exists"
   ansible.builtin.stat:
-    path: "{{ csv_file_path }}"
+    path: "{{ plotter_csv_file_path }}"
   register: csv_file_stat
 
 - name: "main: Fail if CSV file is not found"
   ansible.builtin.fail:
-    msg: "The specified CSV file {{ csv_file_path }} does not exist."
+    msg: "The specified CSV file {{ plotter_csv_file_path }} does not exist."
   when: not csv_file_stat.stat.exists
 
 - name: "main: Use custom plot module"
@@ -23,7 +23,7 @@
   # Toolbox CLI and Ansible CLI
   # TODO: plotto should be in the plotter role and not in the collection root as is specific to a role
   plotto:
-    csv_file_path: "{{ csv_file_path }}"
+    csv_file_path: "{{ plotter_csv_file_path }}"
 
 # - name: "main: Execute the Python script directly"
 #   ansible.builtin.shell: |

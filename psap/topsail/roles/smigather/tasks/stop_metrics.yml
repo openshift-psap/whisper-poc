@@ -1,7 +1,7 @@
 ---
 - name: "stop_metrics: Copy the metrics file from the container to the local system before stopping collection"
   ansible.builtin.shell: >
-    oc cp {{ dcgm_namespace }}/{{ dcgm_pod_name }}:{{ container_output_file }} {{ local_output_file }}
+    oc cp {{ smigather_dcgm_namespace }}/{{ smigather_dcgm_pod_name }}:{{ container_output_file }} {{ smigather_local_output_file }}
   register: copy_metrics_result
   ignore_errors: true
   args:
@@ -9,24 +9,24 @@
 
 - name: "stop_metrics: Delete the dcgm exporter pod to trigger a restart"
   kubernetes.core.k8s:
-    namespace: "{{ dcgm_namespace }}"
+    namespace: "{{ smigather_dcgm_namespace }}"
     kind: Pod
-    name: "{{ dcgm_pod_name }}"
+    name: "{{ smigather_dcgm_pod_name }}"
     state: absent
   register: pod_delete_result
   ignore_errors: true
 
 - name: "stop_metrics: Check if metrics output file exists"
   ansible.builtin.stat:
-    path: "{{ local_output_file }}"
-  register: metrics_file_status
+    path: "{{ smigather_local_output_file }}"
+  register: smigather_metrics_file_status
 
 - name: "stop_metrics: Debug GPU metrics path"
   ansible.builtin.debug:
-    msg: "Metrics collected and saved to {{ local_output_file }}"
-  when: metrics_file_status.stat.exists
+    msg: "Metrics collected and saved to {{ smigather_local_output_file }}"
+  when: smigather_metrics_file_status.stat.exists
 
 - name: "stop_metrics: Warn if no metrics were collected"
   ansible.builtin.debug:
     msg: "No metrics file was found. Metrics collection might have failed."
-  when: not metrics_file_status.stat.exists
+  when: not smigather_metrics_file_status.stat.exists

@@ -2,14 +2,14 @@
 - name: "collect_metrics: Find the DCGM pod name"
   kubernetes.core.k8s_info:
     kind: Pod
-    namespace: "{{ dcgm_namespace }}"
+    namespace: "{{ smigather_dcgm_namespace }}"
     label_selectors:
-      - "app={{ dcgm_pod_label }}"
+      - "app={{ smigather_dcgm_pod_label }}"
   register: dcgm_pod_info
 
 - name: "collect_metrics: Ensure a DCGM pod is found"
   ansible.builtin.fail:
-    msg: "No DCGM pod found in the namespace {{ dcgm_namespace }} with the label {{ dcgm_pod_label }}."
+    msg: "No DCGM pod found in the namespace {{ smigather_dcgm_namespace }} with the label {{ smigather_dcgm_pod_label }}."
   when: dcgm_pod_info.resources | length == 0
 
 - name: "collect_metrics: Debug DCGM pod containers"
@@ -18,35 +18,35 @@
 
 - name: "collect_metrics: Set the DCGM pod and container name"
   ansible.builtin.set_fact:
-    dcgm_pod_name: "{{ dcgm_pod_info.resources[0].metadata.name }}"
-    dcgm_container_name: >-
-      {{ (dcgm_pod_info.resources[0].spec.containers | selectattr('name', 'search', '^nvidia-dcgm-exporter$') | first | default({})).name | default('') }}
+    smigather_dcgm_pod_name: "{{ smigather_dcgm_pod_info.resources[0].metadata.name }}"
+    smigather_dcgm_container_name: >-
+      {{ (smigather_dcgm_pod_info.resources[0].spec.containers | selectattr('name', 'search', '^nvidia-dcgm-exporter$') | first | default({})).name | default('') }}
 
 - name: "collect_metrics: Fail if no matching container is found"
   ansible.builtin.fail:
-    msg: "No container named 'nvidia-dcgm-exporter' found in the DCGM pod '{{ dcgm_pod_name }}'."
-  when: dcgm_container_name == ''
+    msg: "No container named 'nvidia-dcgm-exporter' found in the DCGM pod '{{ smigather_dcgm_pod_name }}'."
+  when: smigather_dcgm_container_name == ''
 
 - name: "collect_metrics: Write the header for collecting GPU metrics"
   kubernetes.core.k8s_exec:
-    namespace: "{{ dcgm_namespace }}"
-    pod: "{{ dcgm_pod_name }}"
-    container: "{{ dcgm_container_name }}"
+    namespace: "{{ smigather_dcgm_namespace }}"
+    pod: "{{ smigather_dcgm_pod_name }}"
+    container: "{{ smigather_dcgm_container_name }}"
     command: |
       bash -c '
-      echo "index,timestamp,utilization.gpu [%],utilization.memory [%],memory.total [MiB],memory.used [MiB],power.draw [W]" > {{ container_output_file }};
+      echo "index,timestamp,utilization.gpu [%],utilization.memory [%],memory.total [MiB],memory.used [MiB],power.draw [W]" > {{ smigather_container_output_file }};
       '
-  register: dcgm_init_task
+  register: smigather_dcgm_init_task
   ignore_errors: true
 
 - name: "collect_metrics: Start collecting GPU metrics in background using shell"
   ansible.builtin.shell: |
-    oc exec -n {{ dcgm_namespace }} {{ dcgm_pod_name }} -c {{ dcgm_container_name }} -- bash -c '
+    oc exec -n {{ smigather_dcgm_namespace }} {{ smigather_dcgm_pod_name }} -c {{ smigather_dcgm_container_name }} -- bash -c '
       while true; do
-        nvidia-smi --query-gpu=index,timestamp,utilization.gpu,utilization.memory,memory.total,memory.used,power.draw --format=csv,noheader,nounits >> {{ container_output_file }};
-        sleep {{ monitor_interval }};
+        nvidia-smi --query-gpu=index,timestamp,utilization.gpu,utilization.memory,memory.total,memory.used,power.draw --format=csv,noheader,nounits >> {{ smigather_container_output_file }};
+        sleep {{ smigather_monitor_interval }};
       done &'
-  register: dcgm_async_task
+  register: smigather_dcgm_async_task
   async: 3600  # Run for 1 hour or adjust as needed
   poll: 0  # Don't wait for the task to finish, allow playbook to continue
   ignore_errors: true
@@ -55,8 +55,8 @@
 
 - name: "collect_metrics: Debug the async task result"
   ansible.builtin.debug:
-    var: dcgm_async_task
+    var: smigather_dcgm_async_task
 
 - name: "collect_metrics: Save the DCGM async task ID"
   ansible.builtin.set_fact:
-    dcgm_task_id: "{{ dcgm_async_task.ansible_job_id }}"
+    dcgm_task_id: "{{ smigather_dcgm_async_task.ansible_job_id }}"

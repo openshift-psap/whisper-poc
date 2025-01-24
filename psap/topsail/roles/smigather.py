@@ -11,7 +11,7 @@ class Smigather:
     Commands related to the current role
     """
 
-    @AnsibleRole("smi_gather")
+    @AnsibleRole("smigather")
     @AnsibleMappedParams
     def main(self,
                     dcgm_namespace="nvidia-gpu-operator",         # Namespace where DCGM pod is located
