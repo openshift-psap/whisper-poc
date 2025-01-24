@@ -1,0 +1,12 @@
+---
+- name: Deploy the vLLM pod and benchmark whisper while gathering dcgm metrics and render some usage plots
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Import role from collection and specify task file
+      import_role:
+        name: psap.topsail.tests
+        tasks_from: whisper.yml
+
+    #- name: Include specific task file whisper.yml from the role
+    #  include_tasks: "psap/topsail/tests/tasks/whisper.yml"

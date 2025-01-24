@@ -1,0 +1,18 @@
+---
+- import_role:
+    name: psap.topsail.smigather
+  vars:
+    collect_metrics_enabled: true
+    stop_metrics_enabled: false
+
+- import_role:
+    name: psap.topsail.whisper
+
+- import_role:
+    name: psap.topsail.smigather
+  vars:
+    collect_metrics_enabled: false
+    stop_metrics_enabled: true
+
+- import_role:
+    name: psap.topsail.plotter

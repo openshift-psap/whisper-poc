@@ -68,6 +68,17 @@ Toolbox Documentation
                 
 * :doc:`main <Smigather.main>`	 Run the Smigather role
 
+``tests``
+*********
+
+::
+
+    Commands related to the current role
+    
+
+                
+* :doc:`main <Tests.main>`	 Run the tests role
+
 ``whisper``
 ***********
 
