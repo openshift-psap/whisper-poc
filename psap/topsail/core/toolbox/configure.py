@@ -4,7 +4,7 @@ import logging
 
 import pathlib
 
-from projects.core.library import env, config, run, configure_logging
+from core.library import env, config, run, configure_logging
 configure_logging()
 
 TOPSAIL_DIR = pathlib.Path(config.__file__).parents[3]

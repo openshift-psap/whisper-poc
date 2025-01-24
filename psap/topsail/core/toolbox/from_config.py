@@ -7,7 +7,7 @@ import traceback
 import jinja2
 import jinja2.filters
 
-from projects.core.library.ansible_toolbox import RunAnsibleRole
+from core.library.ansible_toolbox import RunAnsibleRole
 
 
 class From_Config:
@@ -48,7 +48,7 @@ class From_Config:
             logging.error("--command_args_file flag or TOPSAIL_FROM_COMMAND_ARGS_FILE env var must have a value.")
             raise SystemExit(1)
 
-        from projects.core.library.ansible_toolbox import Toolbox
+        from core.library.ansible_toolbox import Toolbox
         toolbox = Toolbox()
 
         with open(config_file) as f:

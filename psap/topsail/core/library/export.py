@@ -10,7 +10,7 @@ import pathlib
 
 import fire
 
-from projects.core.library import config, run, env
+from core.library import config, run, env
 
 
 def init():

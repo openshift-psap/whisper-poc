@@ -12,6 +12,7 @@ import shutil
 import shlex
 import importlib
 import logging
+from itertools import chain
 
 from core.library import config
 TOPSAIL_DIR = pathlib.Path(config.__file__).parents[2]
@@ -22,10 +23,12 @@ class Toolbox:
     """
 
     def __init__(self):
-        print(TOPSAIL_DIR)
-        for toolbox_file in (TOPSAIL_DIR / "core").glob("*/toolbox/*.py"):
+        toolbox_and_roles_files = chain(
+            (TOPSAIL_DIR / "core" / "toolbox").glob("*.py"),
+            (TOPSAIL_DIR / "roles").glob("*.py")
+        )
+        for toolbox_file in toolbox_and_roles_files:
             if toolbox_file.name.startswith("."): continue
-
             project_toolbox_module = str(toolbox_file.relative_to(TOPSAIL_DIR).with_suffix("")).replace(os.path.sep, ".")
             mod = importlib.import_module(project_toolbox_module)
             toolbox_name = toolbox_file.with_suffix("").name
