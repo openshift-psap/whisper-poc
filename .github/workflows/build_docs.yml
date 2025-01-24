@@ -32,7 +32,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: DocumentationHTML
-          path: docs/_build/html/
+          path: psap/topsail/docs/_build/html/
           if-no-files-found: error
 
       - name: Commit documentation changes
