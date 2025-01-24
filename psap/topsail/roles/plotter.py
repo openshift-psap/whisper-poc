@@ -14,15 +14,13 @@ class Plotter:
     @AnsibleRole("plotter")
     @AnsibleMappedParams
     def main(self,
-                     namespace,
-                     delete_others=True,
+                     csv_file_path="whisper_bench-output/gpu_metrics.csv",
                      ):
         """
         Run the plotter role
 
         Args:
-          namespace: the namespace in which the model should be deployed
-          delete_others: if True, deletes the other serving runtime/inference services of the namespace
+          csv_file_path: the path where the role will be fetching the bench output data
         """
 
         # if runtime not in ("standalone-tgis", "vllm"):

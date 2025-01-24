@@ -14,15 +14,29 @@ class Whisper:
     @AnsibleRole("whisper")
     @AnsibleMappedParams
     def main(self,
-                     namespace,
-                     delete_others=True,
+                    namespace = "my-whisper-runtime",
+                    pod_name = "vllm-standalone",
+                    container_name = "vllm-standalone",
+                    image = "quay.io/psap/whisper-poc:latest-vllm",
+                    commands_to_run = [
+                        "mkdir -p /tmp/output/",
+                        "nvidia-smi > /tmp/output/gpu_status.txt",
+                        "python /workspace/scripts/run_vllm.py > /tmp/output/whisper.txt"
+                    ],
+                    results_folder_path = "/tmp/output",
+                    output_folder_path = "./whisper_bench-output",
                      ):
         """
-        Run the plotter role
+        Run the whisper role
 
         Args:
-          namespace: the namespace in which the model should be deployed
-          delete_others: if True, deletes the other serving runtime/inference services of the namespace
+          namespace: the benchmark's namespace
+          pod_name: the benchmark's pod name
+          container_name: the benchmark's container name
+          image: the benchmark's container image location
+          commands_to_run: the benchmark's commands to run
+          results_folder_path: the benchmark's output folder path relative to the running container
+          output_folder_path: the benchmark's output folder relative to the ansible playbook
         """
 
         # if runtime not in ("standalone-tgis", "vllm"):
