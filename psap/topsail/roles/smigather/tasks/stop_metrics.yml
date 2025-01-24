@@ -1,7 +1,7 @@
 ---
 - name: "stop_metrics: Copy the metrics file from the container to the local system before stopping collection"
   ansible.builtin.shell: >
-    oc cp {{ smigather_dcgm_namespace }}/{{ smigather_dcgm_pod_name }}:{{ container_output_file }} {{ smigather_local_output_file }}
+    oc cp {{ smigather_dcgm_namespace }}/{{ smigather_dcgm_pod_name }}:{{ smigather_container_output_file }} {{ smigather_local_output_file }}
   register: copy_metrics_result
   ignore_errors: true
   args:
