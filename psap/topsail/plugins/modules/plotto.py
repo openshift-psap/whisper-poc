@@ -59,7 +59,7 @@ def generate_plots(csv_file_path, output_dir, module):
                     go.Scatter(
                         x=df['timestamp'],
                         y=df[column],
-                        mode='lines+markers',
+                        mode='markers',  # Only markers, no lines
                         name=f"{column} Over Time"
                     ),
                     row=1, col=1

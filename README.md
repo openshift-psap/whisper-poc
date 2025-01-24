@@ -138,6 +138,18 @@ ansible-galaxy collection install releases/psap-topsail-$VERSION.tar.gz --force
 ansible-playbook playbook_whisper.yml
 ```
 
+#### Publishing a new Topsail release
+
+```
+MY_GALAXY_API_KEY="this_is_a_very_secure_api_key_lol"
+ansible-galaxy collection publish \
+    releases/psap-topsail-$VERSION.tar.gz \
+    --server https://galaxy.ansible.com \
+    --ignore-certs \
+    --verbose \
+    --api-key $MY_GALAXY_API_KEY
+```
+
 ## Equivalent executions
 
 Example of how both CLIs should be aligned to run a specific role:
