@@ -36,9 +36,9 @@ def _generate_config(component):
     for arg in doc.args or {}:
         args[arg.name] = arg
 
-    roles_dir = pathlib.Path(component.__module__.replace(".", "/")).parent.parent / "toolbox"
+    # roles_dir = pathlib.Path(component.__module__.replace(".", "/")).parent.parent / "toolbox"
 
-    dest = TOPSAIL_DIR / roles_dir / component.ansible_role / "defaults" / "main" / "config.yml"
+    dest = TOPSAIL_DIR / "roles" / component.ansible_role / "defaults" / "main.yml"
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     print(f"{component.__qualname__}\n- generating {dest} ...\n")

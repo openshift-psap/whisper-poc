@@ -1,4 +1,7 @@
----
-# defaults file for plotter
+# Auto-generated file, do not edit manually ...
+# Toolbox generate command: repo generate_ansible_default_settings
+# Source component: Plotter.main
 
-csv_file_path: whisper_bench-output/gpu_metrics.csv
+# Parameters
+# the path where the role will be fetching the bench output data
+plotter_csv_file_path: whisper_bench-output/gpu_metrics.csv
