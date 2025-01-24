@@ -25,6 +25,7 @@ class Toolbox:
     def __init__(self):
         toolbox_and_roles_files = chain(
             (TOPSAIL_DIR / "core" / "toolbox").glob("*.py"),
+            (TOPSAIL_DIR / "core" / "repo" / "toolbox").glob("*.py"),
             (TOPSAIL_DIR / "roles").glob("*.py")
         )
         for toolbox_file in toolbox_and_roles_files:

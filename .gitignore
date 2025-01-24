@@ -1,4 +1,4 @@
 output
 whisper_bench-output
 plots/*.png
-psap/topsail/core/library/__pycache__/*
+**/__pycache__/
