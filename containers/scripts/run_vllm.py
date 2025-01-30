@@ -2,6 +2,7 @@ from datasets import load_dataset
 from vllm import LLM, SamplingParams
 import time
 import json
+import os
 
 # Load and filter the dataset
 dataset = load_dataset("MLCommons/peoples_speech", "validation")
