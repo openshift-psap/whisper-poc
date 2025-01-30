@@ -1,3 +1,5 @@
 datasets
 librosa
 soundfile
+plotly
+kaleido
