@@ -19,7 +19,8 @@ whisper_image: quay.io/psap/whisper-poc:latest-vllm
 whisper_commands_to_run:
 - mkdir -p /tmp/output/
 - nvidia-smi > /tmp/output/gpu_status.txt
-- python /workspace/scripts/run_vllm.py > /tmp/output/whisper.txt
+- python /workspace/scripts/run_vllm.py
+- python /workspace/scripts/run_vllm_plot.py
 
 # the benchmark's output folder path relative to the running container
 whisper_results_folder_path: /tmp/output

@@ -24,3 +24,6 @@ spec:
       operator: Exists
       effect: NoSchedule  # Ensure the pod is scheduled on GPU nodes
 EOF
+
+# Connect to the container with:
+# oc exec -it vllm-standalone -n my-whisper-runtime -- /bin/bash
