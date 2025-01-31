@@ -7,11 +7,11 @@ import os
 # Load and filter the dataset
 dataset = load_dataset("MLCommons/peoples_speech", "validation")
 dataset = dataset.filter(lambda example: example['duration_ms'] < 30000 and example['duration_ms'] > 10000)
-data_subset = dataset["validation"].select(range(200))
+data_subset = dataset["validation"]# .select(range(200))
 
 # Model configuration
 tensor_parallel_size = 1
-model = "openai/whisper-small"  # ["openai/whisper-small", "openai/whisper-large-v3-turbo"]
+model = "openai/whisper-large-v3"  # ["openai/whisper-small", "openai/whisper-large-v3-turbo"]
 max_num_seqs = 100
 gpu_memory_utilization = 0.95
 enforce_eager = True
