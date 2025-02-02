@@ -21,26 +21,21 @@ python3 convert_checkpoint.py --model_dir ${MODEL_DIR} \
                               --weight_only_precision $WEIGHT_ONLY_PRECISION \
                               --model_name large-v3 # or small
 
+# Encoder build
 trtllm-build  --checkpoint_dir ${OUTPUT_DIR}/encoder \
               --output_dir ${OUTPUT_DIR}/encoder \
-              --context_fmha disable \
-              --moe_plugin disable \
-              --gemm_plugin disable \
               --max_batch_size ${MAX_BATCH_SIZE} \
-              --max_seq_len ${MAX_SEQ_LEN} \
-              --max_input_len ${MAX_INPUT_LEN} \
-              --max_encoder_input_len ${MAX_ENCODER_INPUT_LEN} \
-              --bert_attention_plugin ${INFERENCE_PRECISION} \
-              --gpt_attention_plugin ${INFERENCE_PRECISION}
+              --max_seq_len ${MAX_ENCODER_SEQ_LEN} \
+              --max_input_len ${MAX_ENCODER_INPUT_LEN}
 
+# Decoder build
 trtllm-build  --checkpoint_dir ${OUTPUT_DIR}/decoder \
               --output_dir ${OUTPUT_DIR}/decoder \
-              --max_seq_len ${MAX_SEQ_LEN} \
-              --max_input_len ${MAX_INPUT_LEN} \
-              --gemm_plugin ${INFERENCE_PRECISION} \
-              --bert_attention_plugin ${INFERENCE_PRECISION} \
-              --gpt_attention_plugin ${INFERENCE_PRECISION} \
-              --context_fmha disable
+              --max_beam_width ${MAX_BEAM_WIDTH} \
+              --max_batch_size ${MAX_BATCH_SIZE} \
+              --max_seq_len ${MAX_DECODER_SEQ_LEN} \
+              --max_input_len ${MAX_DECODER_INPUT_LEN} \
+              --max_encoder_input_len ${MAX_ENCODER_INPUT_LEN}
 
 cd ~/tensorrtllm_backend
 cp all_models/whisper/ model_repo_whisper -r
@@ -57,3 +52,12 @@ python3 tools/fill_template.py -i model_repo_whisper/whisper_bls/config.pbtxt en
 #echo "source ~/scripts/trt-whisper-vars.sh"
 #echo "cd tensorrtllm_backend/"
 #echo "python3 scripts/launch_triton_server.py --world_size 1 --model_repo=model_repo_whisper/ --tensorrt_llm_model_name tensorrt_llm,whisper_bls --multimodal_gpu0_cuda_mem_pool_bytes 300000000"
+cd ~/tensorrtllm_backend/tensorrt_llm/examples/whisper
+
+python3 run.py --engine_dir $OUTPUT_DIR \
+               --dataset hf-internal-testing/librispeech_asr_dummy \
+               --enable_warmup \
+               --name librispeech_dummy_large_v3 \
+               --assets_dir ~/assets \
+               --batch_size ${MAX_BATCH_SIZE} \
+               --num_beams ${MAX_BEAM_WIDTH}
