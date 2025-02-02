@@ -97,7 +97,7 @@ Alternatively, to do offline inference (don't need to run triton server for this
 
 ```
 source ~/scripts/trt-whisper-vars.sh
-cd ~/tensorrtllm_backend/tensort_llm/examples/whisper
+cd ~/tensorrtllm_backend/tensorrt_llm/examples/whisper
 python3 run.py --engine_dir $output_dir --dataset hf-internal-testing/librispeech_asr_dummy --enable_warmup --name librispeech_dummy_large_v3 --assets_dir ~/assets
 ```
 

@@ -28,3 +28,6 @@ spec:
       medium: Memory
       sizeLimit: 32Gi
 EOF
+
+# Connect to the container with:
+# oc exec -it trt-standalone -n my-whisper-runtime -- /bin/bash
