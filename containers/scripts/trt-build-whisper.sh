@@ -54,10 +54,13 @@ python3 tools/fill_template.py -i model_repo_whisper/whisper_bls/config.pbtxt en
 #echo "python3 scripts/launch_triton_server.py --world_size 1 --model_repo=model_repo_whisper/ --tensorrt_llm_model_name tensorrt_llm,whisper_bls --multimodal_gpu0_cuda_mem_pool_bytes 300000000"
 cd ~/tensorrtllm_backend/tensorrt_llm/examples/whisper
 
-python3 run.py --engine_dir $OUTPUT_DIR \
-               --dataset hf-internal-testing/librispeech_asr_dummy \
-               --enable_warmup \
-               --name librispeech_dummy_large_v3 \
-               --assets_dir ~/assets \
-               --batch_size ${MAX_BATCH_SIZE} \
-               --num_beams ${MAX_BEAM_WIDTH}
+# Once the container is running execute:
+# source ~/scripts/trt-whisper-vars.sh
+# cd ~/tensorrtllm_backend/tensorrt_llm/examples/whisper
+# python3 run.py --engine_dir $OUTPUT_DIR \
+#                --dataset hf-internal-testing/librispeech_asr_dummy \
+#                --enable_warmup \
+#                --name librispeech_dummy_large_v3 \
+#                --assets_dir ~/assets \
+#                --batch_size ${MAX_BATCH_SIZE} \
+#                --num_beams ${MAX_BEAM_WIDTH}
