@@ -21,7 +21,7 @@ python3 convert_checkpoint.py --model_dir ${MODEL_DIR} \
                               --output_dir ${OUTPUT_DIR} \
                               --use_weight_only \
                               --weight_only_precision $WEIGHT_ONLY_PRECISION \
-                              --model_name small
+                              --model_name large-v3
 
 echo "Building the encoder"
 # Encoder build
