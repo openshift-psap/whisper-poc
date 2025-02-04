@@ -34,6 +34,7 @@ import argparse
 import json
 import math
 import re
+import os
 import time
 from collections import OrderedDict
 from pathlib import Path
@@ -81,7 +82,10 @@ def parse_arguments():
     parser.add_argument('--name',
                         type=str,
                         default="librispeech_dummy_benchmark")
-    parser.add_argument('--batch_size', type=int, default=4)
+
+    #parser.add_argument('--batch_size', type=int, default=4)
+    parser.add_argument("--batch_size", type=int, nargs='+', default=[1, 2, 4, 8, 16, 32, 64, 128, 256, 512], help="List of batch sizes to test")
+
     parser.add_argument('--num_beams', type=int, default=1)
     parser.add_argument('--debug', action='store_true')
     parser.add_argument('--enable_warmup', action='store_true')
@@ -577,71 +581,100 @@ def decode_dataset(
 if __name__ == '__main__':
     args = parse_arguments()
     tensorrt_llm.logger.set_level(args.log_level)
-    model = WhisperTRTLLM(args.engine_dir, args.debug, args.assets_dir,
-                          args.batch_size, args.use_py_session, args.num_beams)
-    normalizer = EnglishTextNormalizer()
-    dataset = load_dataset(args.dataset,
-                           args.dataset_name,
-                           split=args.dataset_split)
-    if args.enable_warmup:
-        results, total_duration = decode_dataset(
-            model,
-            dataset,
-            batch_size=args.batch_size,
-            num_beams=args.num_beams,
-            normalizer=normalizer,
-            mel_filters_dir=args.assets_dir,
-            padding_strategy=args.padding_strategy)
 
-    start_time = time.time()
-    if args.input_file:
-        results, total_duration = decode_wav_file(
-            args.input_file,
-            model,
-            text_prefix=args.text_prefix,
-            dtype=args.dtype,
-            batch_size=args.batch_size,
-            num_beams=args.num_beams,
-            mel_filters_dir=args.assets_dir,
-            padding_strategy=args.padding_strategy)
-    else:
-        results, total_duration = decode_dataset(
-            model,
-            dataset,
-            text_prefix=args.text_prefix,
-            dtype=args.dtype,
-            batch_size=args.batch_size,
-            num_beams=args.num_beams,
-            normalizer=normalizer,
-            mel_filters_dir=args.assets_dir,
-            compute_cer=args.compute_cer,
-            padding_strategy=args.padding_strategy)
-    elapsed = time.time() - start_time
-    results = sorted(results)
+    for batch_size in args.batch_size:
+        print(f"Processing with batch size: {batch_size}")
 
-    Path(args.results_dir).mkdir(parents=True, exist_ok=True)
-    store_transcripts(filename=f"{args.results_dir}/recogs-{args.name}.txt",
-                      texts=results)
+        model = WhisperTRTLLM(args.engine_dir, args.debug, args.assets_dir,
+                            batch_size, args.use_py_session, args.num_beams)
+        normalizer = EnglishTextNormalizer()
+        dataset = load_dataset(args.dataset,
+                            args.dataset_name,
+                            split=args.dataset_split)
+        if args.enable_warmup:
+            results, total_duration = decode_dataset(
+                model,
+                dataset,
+                batch_size=batch_size,
+                num_beams=args.num_beams,
+                normalizer=normalizer,
+                mel_filters_dir=args.assets_dir,
+                padding_strategy=args.padding_strategy)
 
-    with open(f"{args.results_dir}/errs-{args.name}.txt", "w") as f:
-        total_error_rate = write_error_stats(f,
-                                             "test-set",
-                                             results,
-                                             enable_log=True)
-        if args.accuracy_check and args.dataset == "hf-internal-testing/librispeech_asr_dummy" and not args.input_file:
-            assert total_error_rate <= 2.8, f"Word Error rate using whisper large-v3 model should be 2.40%, but got {total_error_rate}"
+        start_time = time.time()
+        if args.input_file:
+            results, total_duration = decode_wav_file(
+                args.input_file,
+                model,
+                text_prefix=args.text_prefix,
+                dtype=args.dtype,
+                batch_size=batch_size,
+                num_beams=args.num_beams,
+                mel_filters_dir=args.assets_dir,
+                padding_strategy=args.padding_strategy)
+        else:
+            results, total_duration = decode_dataset(
+                model,
+                dataset,
+                text_prefix=args.text_prefix,
+                dtype=args.dtype,
+                batch_size=batch_size,
+                num_beams=args.num_beams,
+                normalizer=normalizer,
+                mel_filters_dir=args.assets_dir,
+                compute_cer=args.compute_cer,
+                padding_strategy=args.padding_strategy)
+        elapsed = time.time() - start_time
+        results = sorted(results)
 
-    rtf = elapsed / total_duration
-    s = f"RTF: {rtf:.4f}\n"
-    s += f"total_duration: {total_duration:.3f} seconds\n"
-    s += f"({total_duration/3600:.2f} hours)\n"
-    s += f"processing time: {elapsed:.3f} seconds " f"({elapsed/3600:.2f} hours)\n"
-    s += f"batch size: {args.batch_size}\n"
-    s += f"num_beams: {args.num_beams}\n"
-    s += f"total error rate: {total_error_rate:.2f}%\n"
-    print(s)
+        Path(args.results_dir).mkdir(parents=True, exist_ok=True)
+        store_transcripts(filename=f"{args.results_dir}/recogs-{args.name}.txt",
+                        texts=results)
 
-    with open(f"{args.results_dir}/rtf-{args.name}.txt", "w") as f:
-        f.write(s)
+        with open(f"{args.results_dir}/errs-{args.name}.txt", "w") as f:
+            total_error_rate = write_error_stats(f,
+                                                "test-set",
+                                                results,
+                                                enable_log=True)
+            if args.accuracy_check and args.dataset == "hf-internal-testing/librispeech_asr_dummy" and not args.input_file:
+                assert total_error_rate <= 2.8, f"Word Error rate using whisper large-v3 model should be 2.40%, but got {total_error_rate}"
 
-    del model
+        rtf = elapsed / total_duration
+        s = f"RTF: {rtf:.4f}\n"
+        s += f"total_duration: {total_duration:.3f} seconds\n"
+        s += f"({total_duration/3600:.2f} hours)\n"
+        s += f"processing time: {elapsed:.3f} seconds " f"({elapsed/3600:.2f} hours)\n"
+        s += f"batch size: {batch_size}\n"
+        s += f"num_beams: {args.num_beams}\n"
+        s += f"total error rate: {total_error_rate:.2f}%\n"
+        print(s)
+
+        with open(f"{args.results_dir}/rtf-{args.name}-{batch_size}.txt", "w") as f:
+            f.write(s)
+
+
+        # Calculate performance metrics
+        # Assuming each result is a tuple and the transcription text is the first element
+        num_tokens = sum(len(result[0].split()) for result in results)  # Extract the first element of the tuple
+        throughput = num_tokens / elapsed  # tokens per second
+        latency = elapsed / len(results)  # time per request
+
+        performance_metrics = {
+            "batch_size": batch_size,
+            "total_time": elapsed,
+            "num_tokens": num_tokens,
+            "throughput": throughput,
+            "latency": latency,
+            "requests_processed": len(results),
+            "seconds_transcribed_per_sec": total_duration / elapsed
+        }
+
+        # Store the metrics in a JSON file
+        os.makedirs(args.results_dir, exist_ok=True)
+        os.makedirs('/tmp/output', exist_ok=True)
+        with open(f"/tmp/output/output-trt-{batch_size:03d}.json", "w") as f:
+            json.dump(performance_metrics, f, indent=4)
+
+
+
+        del model

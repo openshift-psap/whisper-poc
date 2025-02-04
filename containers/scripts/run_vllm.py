@@ -20,7 +20,7 @@ temperature = 0
 top_p = 1.0
 max_tokens =200
 
-concurrency_levels = [1, 2, 4, 8, 16, 32]  # Adjust these values as needed
+concurrency_levels = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]  # Adjust these values as needed
 
 llm = LLM(
     model=model,
@@ -83,7 +83,7 @@ def run_with_batching(batch_size):
     }
     # Store the metrics in a JSON file
     os.makedirs('/tmp/output', exist_ok=True)
-    with open(f"/tmp/output/output-{batch_size:03d}.json", "w") as f:
+    with open(f"/tmp/output/output-vllm-{batch_size:03d}.json", "w") as f:
         json.dump(performance_metrics, f, indent=4)
 
 

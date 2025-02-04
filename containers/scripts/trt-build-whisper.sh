@@ -64,14 +64,13 @@ python3 tools/fill_template.py -i model_repo_whisper/whisper_bls/config.pbtxt en
 
 # cd ~/tensorrtllm_backend/tensorrt_llm/examples/whisper
 
-cd
-# Once the container is running execute:
-source ~/scripts/trt-whisper-vars.sh
-# cd ~/tensorrtllm_backend/tensorrt_llm/examples/whisper
-python3 ~/scripts/run_trt.py --engine_dir $OUTPUT_DIR \
-               --dataset hf-internal-testing/librispeech_asr_dummy \
-               --enable_warmup \
-               --name librispeech_dummy_large_v3 \
-               --assets_dir ~/assets \
-               --batch_size ${MAX_BATCH_SIZE} \
-               --num_beams ${MAX_BEAM_WIDTH}
+# cd
+# # Once the container is running execute:
+# source ~/scripts/trt-whisper-vars.sh
+# # cd ~/tensorrtllm_backend/tensorrt_llm/examples/whisper
+# python3 ~/scripts/run_trt.py --engine_dir $OUTPUT_DIR \
+#                --dataset hf-internal-testing/librispeech_asr_dummy \
+#                --enable_warmup \
+#                --name librispeech_dummy_large_v3 \
+#                --assets_dir ~/assets \
+#                --num_beams ${MAX_BEAM_WIDTH}
