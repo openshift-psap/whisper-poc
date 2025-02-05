@@ -79,7 +79,9 @@ def run_with_batching(batch_size):
         "throughput": throughput,
         "latency": latency,
         "requests_processed": len(outputs),
-        "seconds_transcribed_per_sec": total_audio_seconds / total_time
+        "seconds_transcribed_per_sec": total_audio_seconds / total_time,
+        "start_time": start_time,
+        "end_time": end_time
     }
     # Store the metrics in a JSON file
     os.makedirs('/tmp/output', exist_ok=True)

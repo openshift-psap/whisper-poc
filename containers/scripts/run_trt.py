@@ -624,7 +624,8 @@ if __name__ == '__main__':
                 mel_filters_dir=args.assets_dir,
                 compute_cer=args.compute_cer,
                 padding_strategy=args.padding_strategy)
-        elapsed = time.time() - start_time
+        end_time = time.time()
+        elapsed = end_time - start_time
         results = sorted(results)
 
         Path(args.results_dir).mkdir(parents=True, exist_ok=True)
@@ -666,7 +667,9 @@ if __name__ == '__main__':
             "throughput": throughput,
             "latency": latency,
             "requests_processed": len(results),
-            "seconds_transcribed_per_sec": total_duration / elapsed
+            "seconds_transcribed_per_sec": total_duration / elapsed,
+            "start_time": start_time,
+            "end_time": end_time
         }
 
         # Store the metrics in a JSON file
