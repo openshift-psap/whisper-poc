@@ -5,6 +5,7 @@ import os
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import json
 
 def generate_plots(csv_file_path, output_dir, module):
     """Generate plots from the CSV file and save them to the output directory."""
@@ -13,6 +14,8 @@ def generate_plots(csv_file_path, output_dir, module):
     if not os.path.exists(csv_file_path):
         module.fail_json(msg=f"CSV file '{csv_file_path}' does not exist.")
 
+    base_dir = output_dir
+    output_dir = os.path.join(output_dir, "images")
     # Ensure the output directory exists
     if not os.path.exists(output_dir):
         try:
@@ -43,18 +46,32 @@ def generate_plots(csv_file_path, output_dir, module):
 
     generated_files = []
 
+    # Read JSON data for vertical lines
+    json_files = [f for f in os.listdir(base_dir) if f.endswith(".json")]
+    vertical_lines = []
+    for json_file in json_files:
+        try:
+            with open(os.path.join(base_dir, json_file), 'r') as f:
+                data = json.load(f)
+                start_time = pd.to_datetime(data["start_time"], unit='s')
+                # end_time = pd.to_datetime(data["end_time"], unit='s')
+                concurrency = data.get("concurrency", "N/A")
+                vertical_lines.append((start_time, concurrency))
+                # vertical_lines.append((end_time, concurrency))
+        except Exception as e:
+            module.fail_json(msg=f"Failed to read JSON file '{json_file}': {e}")
+
     # Generate and save plots
     for column, filename in plots.items():
         if column in df.columns:
             try:
-                # Create a subplot layout with two panels: line plot and boxplot
+
                 fig = make_subplots(
                     rows=1, cols=2,
-                    column_widths=[0.7, 0.3],
+                    column_widths=[2, 0.3],
                     subplot_titles=(f"{column} Over Time", f"{column} Distribution")
                 )
 
-                # Add line plot to the first panel
                 fig.add_trace(
                     go.Scatter(
                         x=df['timestamp'],
@@ -65,7 +82,16 @@ def generate_plots(csv_file_path, output_dir, module):
                     row=1, col=1
                 )
 
-                # Add boxplot to the second panel
+                for vline, concurrency in vertical_lines:
+                    fig.add_vline(x=vline, line=dict(color='red', width=1, dash='dash'))
+                    fig.add_annotation(
+                        x=vline, y=df[column].max(),
+                        text=f"{concurrency}",
+                        showarrow=True,
+                        arrowhead=2,
+                        yshift=10
+                    )
+
                 fig.add_trace(
                     go.Box(
                         y=df[column],
@@ -75,15 +101,14 @@ def generate_plots(csv_file_path, output_dir, module):
                     row=1, col=2
                 )
 
-                # Update layout for aesthetics
                 fig.update_layout(
                     title=f"{column} Analysis",
                     xaxis_title="Time",
                     yaxis_title=column,
-                    showlegend=False
+                    showlegend=False,
+                    width=1800
                 )
 
-                # Save the plot as an image
                 output_path = os.path.join(output_dir, filename)
                 fig.write_image(output_path)
                 generated_files.append(output_path)
