@@ -1,3 +1,4 @@
 sphinx-rtd-theme==1.2.2
 myst-parser==2.0.0
 sphinxcontrib-versioning==2.2.1
+ansible-playbook-grapher

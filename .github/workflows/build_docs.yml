@@ -29,6 +29,33 @@ jobs:
           cd ./psap/topsail/docs
           make html
 
+      - name: Install the collection
+        run: |
+          cd psap/topsail
+          rm -rf ~/.ansible/collections/ansible_collections/psap/topsail
+          ansible-galaxy collection build -v --force --output-path releases/
+          ansible-galaxy collection install --force --force-with-deps releases/psap-topsail-`cat galaxy.yml | shyaml get-value version`.tar.gz
+
+      - name: Render the projects roles and inventory diagrams
+        run: |
+          set -x
+          cd psap/topsail
+          ansible-playbook-grapher --include-role-tasks \
+                                   --renderer mermaid-flowchart \
+                                   playbook_whisper.yml \
+                                   -o docs/_static/playbook_whisper.mmd
+
+          cat << EOF >> docs/playbook_diagrams.rst
+
+          playbook task whisper
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+          .. image:: static/playbook_whisper.mmd
+            :width: 400
+            :alt: Alternative text
+
+          EOF
+
       - uses: actions/upload-artifact@v4
         with:
           name: DocumentationHTML
