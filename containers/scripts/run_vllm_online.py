@@ -20,10 +20,10 @@ from transformers import AutoTokenizer
 
 # Configuration
 TOTAL_REQUESTS = 32
-MAX_REQ_CONCURRENCY = 100
+MAX_REQ_CONCURRENCY = 32
 
 openai_api_base = "http://localhost:8000/v1"
-client = OpenAI(api_key="", base_url=openai_api_base)
+client = OpenAI(api_key="EMPTY", base_url=openai_api_base)
 model_name = "openai/whisper-large-v3"  # ["openai/whisper-small", "openai/whisper-large-v3-turbo"]
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
@@ -97,7 +97,8 @@ data_subset = dataset["validation"]# .select(range(200))
 if TOTAL_REQUESTS > 0:
     data_subset = data_subset.select(range(TOTAL_REQUESTS))
 
-
+# Warmup, the first librosa.load is really slow
+_ = asyncio.run(run_load_test(data_subset.select(range(2)), 1))
 start = time.perf_counter()
 results = asyncio.run(run_load_test(data_subset, MAX_REQ_CONCURRENCY))
 end = time.perf_counter()
