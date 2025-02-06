@@ -3,10 +3,10 @@ from datasets import load_dataset
 import time
 import json
 import os
-from typing import List, Tuple, AsyncGenerator
+from typing import List
 from statistics import mean, median
 import asyncio
-from openai import OpenAI, AsyncOpenAI
+from openai import AsyncOpenAI
 from statistics import mean, median
 import io
 from scipy.io.wavfile import write
@@ -23,7 +23,6 @@ TOTAL_REQUESTS = 64
 concurrency_levels = [1, 2, 4, 8, 16, 32]#, 64, 128, 256]
 
 openai_api_base = "http://localhost:8000/v1"
-# client = OpenAI(api_key="EMPTY", base_url=openai_api_base)
 client = AsyncOpenAI(api_key="EMPTY", base_url=openai_api_base)
 model_name = "openai/whisper-large-v3"  # ["openai/whisper-small", "openai/whisper-large-v3-turbo"]
 tokenizer = AutoTokenizer.from_pretrained(model_name)
