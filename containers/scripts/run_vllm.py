@@ -3,6 +3,7 @@ from vllm import LLM, SamplingParams
 import time
 import json
 import os
+import argparse
 
 # Load and filter the dataset
 dataset = load_dataset("MLCommons/peoples_speech", "validation")
@@ -89,6 +90,20 @@ def run_with_batching(batch_size):
         json.dump(performance_metrics, f, indent=4)
 
 
-for batch_size in concurrency_levels:
-    print(f"Running with batch size: {batch_size}")
-    run_with_batching(batch_size)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Process only the model name.")
+    parser.add_argument('--model', type=str, help='Specify the model')
+    args = parser.parse_args()
+
+    if args.model:
+        print(f"Model: {args.model}")
+        for batch_size in concurrency_levels:
+            print(f"Running with batch size: {batch_size}")
+            run_with_batching(batch_size)
+    else:
+        print("No model specified.")
+
+if __name__ == "__main__":
+    main()

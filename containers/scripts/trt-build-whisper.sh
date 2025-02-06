@@ -1,6 +1,25 @@
 #! /bin/bash
 set -ex
 
+usage() {
+    echo "Usage: $0 -m <model_name>"
+    exit 1
+}
+MODEL_NAME=""
+while getopts "m:" opt; do
+    case "$opt" in
+        m) MODEL_NAME="$OPTARG" ;;
+        *) usage ;;
+    esac
+done
+
+if [ -z "$MODEL_NAME" ]; then
+    echo "Error: -m <model> parameter is required"
+    usage
+fi
+
+echo "Model: $MODEL_NAME"
+
 # Steps mostly from https://github.com/triton-inference-server/tensorrtllm_backend/blob/v0.16.0/docs/whisper.md
 # with minor fixes to paths
 
@@ -21,7 +40,7 @@ python3 convert_checkpoint.py --model_dir ${MODEL_DIR} \
                               --output_dir ${OUTPUT_DIR} \
                               --use_weight_only \
                               --weight_only_precision $WEIGHT_ONLY_PRECISION \
-                              --model_name large-v3
+                              --model_name ${MODEL_NAME}
 
 echo "Building the encoder"
 # Encoder build
