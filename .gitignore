@@ -3,3 +3,4 @@ whisper_bench-output*
 plots/*.png
 **/__pycache__/
 ara-output
+vars.yml

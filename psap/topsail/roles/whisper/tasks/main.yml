@@ -59,7 +59,7 @@
       spec:
         containers:
           - name: vllm-standalone
-            image: quay.io/psap/whisper-poc:latest-vllm
+            image: "{{ whisper_image }}"
             imagePullPolicy: Always
             command:
               - bash

@@ -46,7 +46,7 @@ echo "Building the encoder"
 # Encoder build
 trtllm-build --checkpoint_dir ${OUTPUT_DIR}/encoder \
              --output_dir ${OUTPUT_DIR}/encoder \
-             --max_batch_size ${MAX_BATCH_SIZE} \
+             --max_batch_size ${MAX_ENCODER_BATCH_SIZE} \
              --max_seq_len ${MAX_ENCODER_SEQ_LEN} \
              --max_input_len ${MAX_ENCODER_INPUT_LEN}
 
@@ -55,7 +55,7 @@ echo "Building the decoder"
 trtllm-build --checkpoint_dir ${OUTPUT_DIR}/decoder \
              --output_dir ${OUTPUT_DIR}/decoder \
              --max_beam_width ${MAX_BEAM_WIDTH} \
-             --max_batch_size ${MAX_BATCH_SIZE} \
+             --max_batch_size ${MAX_DECODER_BATCH_SIZE} \
              --max_seq_len ${MAX_DECODER_SEQ_LEN} \
              --max_input_len ${MAX_DECODER_INPUT_LEN} \
              --max_encoder_input_len ${MAX_ENCODER_INPUT_LEN}

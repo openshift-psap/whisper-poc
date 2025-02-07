@@ -174,6 +174,26 @@ ansible-playbook playbook_whisper.yml
 
 ```
 
+### Extending the collection default variables
+
+```
+# Create a file with the extra vars
+VARS_FILE="./vars.yml"
+
+cat <<EOF > $VARS_FILE
+whisper_image: quay.io/psap/whisper-poc:latest-trt
+whisper_commands_to_run:
+  - mkdir -p /tmp/output/
+  - nvidia-smi > /tmp/output/gpu_status.txt
+  - source /home/trt/scripts/trt-whisper-vars.sh && bash /home/trt/scripts/trt-build-whisper.sh -m small
+  - source /home/trt/scripts/trt-whisper-vars.sh && python3 /home/trt/scripts/run_trt.py --engine_dir $OUTPUT_DIR --dataset hf-internal-testing/librispeech_asr_dummy --enable_warmup --name librispeech_dummy_large_v3 --assets_dir ~/assets  --num_beams ${MAX_BEAM_WIDTH}
+  - python /home/trt/scripts/scripts/run_vllm_plot.py
+EOF
+
+# Running from the Ansible CLI
+ansible-playbook playbook_whisper.yml -e @$VARS_FILE
+```
+
 ## Logging
 
 ```
@@ -186,7 +206,7 @@ ansible-playbook playbook_whisper.yml
 # lookup_plugins=/usr/local/lib/python3.10/dist-packages/ara/plugins/lookup
 
 # Let's make sure the local DB is clean
-ara-manage prune
+ara-manage prune --confirm
 ansible-playbook playbook_plotter.yml
 ara-manage generate ./ara-output
 ```
@@ -194,3 +214,6 @@ ara-manage generate ./ara-output
 ## Documentation
 
 [Documentation site](https://openshift-psap.github.io/whisper-poc/)
+
+
+python3 /home/trt/scripts/run_trt.py --engine_dir $OUTPUT_DIR --dataset hf-internal-testing/librispeech_asr_dummy --enable_warmup --name librispeech_dummy_large_v3 --assets_dir ~/assets  --num_beams ${MAX_BEAM_WIDTH}
