@@ -174,6 +174,23 @@ ansible-playbook playbook_whisper.yml
 
 ```
 
+## Logging
+
+```
+
+# Update the ansible configuration (ansible.cfg) accordingly.
+# python -m ara.setup.ansible
+# [defaults]
+# callback_plugins=/usr/local/lib/python3.10/dist-packages/ara/plugins/callback
+# action_plugins=/usr/local/lib/python3.10/dist-packages/ara/plugins/action
+# lookup_plugins=/usr/local/lib/python3.10/dist-packages/ara/plugins/lookup
+
+# Let's make sure the local DB is clean
+ara-manage prune
+ansible-playbook playbook_plotter.yml
+ara-manage generate ./ara-output
+```
+
 ## Documentation
 
 [Documentation site](https://openshift-psap.github.io/whisper-poc/)
