@@ -11,6 +11,14 @@ This is a PoC example
 
    extending/toolbox
 
+.. _extending_topsail:
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Sequence diagrams
+
+   extending/playbook_diagrams
+
 .. _topsail_toolbox:
 
 .. toctree::

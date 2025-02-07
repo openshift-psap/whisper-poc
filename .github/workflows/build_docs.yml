@@ -41,13 +41,25 @@ jobs:
           ansible-playbook-grapher --include-role-tasks \
                                    --renderer graphviz \
                                    playbook_whisper.yml \
-                                   -o docs/_build/html/_sources/playbook_whisper
-          cat << EOF >> docs/playbook_diagrams.rst
+                                   -o docs/_build/html/extending/playbook_whisper
+          ansible-playbook-grapher --include-role-tasks \
+                                   --renderer graphviz \
+                                   playbook_plotter.yml \
+                                   -o docs/_build/html/extending/playbook_plotter
+
+          cat << EOF >> docs/extending/playbook_diagrams.rst
 
           playbook task whisper
-          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          ~~~~~~~~~~~~~~~~~~~~~
 
-          .. image:: _sources/playbook_whisper.svg
+          .. image:: /playbook_whisper.svg
+            :width: 400
+            :alt: Alternative text
+
+          playbook task plotter
+          ~~~~~~~~~~~~~~~~~~~~~
+
+          .. image:: /playbook_plotter.svg
             :width: 400
             :alt: Alternative text
 

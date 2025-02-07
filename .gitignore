@@ -1,4 +1,4 @@
 output
-whisper_bench-output
+whisper_bench-output*
 plots/*.png
 **/__pycache__/
