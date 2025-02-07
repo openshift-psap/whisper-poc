@@ -180,18 +180,16 @@ ansible-playbook playbook_whisper.yml
 # Create a file with the extra vars
 VARS_FILE="./vars.yml"
 
+# Use small or large-v3
+# TODO: the variables passed to the CLI should be fetched from the env vars if configured
+
 cat <<EOF > $VARS_FILE
 whisper_image: quay.io/psap/whisper-poc:latest-trt
 whisper_commands_to_run:
   - mkdir -p /tmp/output/
   - nvidia-smi > /tmp/output/gpu_status.txt
-  - source /home/trt/scripts/trt-whisper-vars.sh && bash /home/trt/scripts/trt-build-whisper.sh -m small
-  - source /home/trt/scripts/trt-whisper-vars.sh && python3 /home/trt/scripts/run_trt.py --engine_dir $OUTPUT_DIR \
-            --dataset hf-internal-testing/librispeech_asr_dummy \
-            --enable_warmup \
-            --name librispeech_dummy_large_v3 \
-            --assets_dir ~/assets \
-            --num_beams ${MAX_BEAM_WIDTH}
+  - bash /home/trt/scripts/trt-build-whisper.sh -m small > /tmp/trt-build-whisper.log 2>&1
+  - python3 /home/trt/scripts/run_trt.py --engine_dir ~/tensorrtllm_backend/tensorrt_llm/examples/whisper/trt_engines/large_v3_max_batch_64 --dataset hf-internal-testing/librispeech_asr_dummy --enable_warmup --name librispeech_dummy_large_v3 --assets_dir ~/assets --num_beams 1 > /tmp/run_trt.log 2>&1
   - python3 /home/trt/scripts/run_vllm_plot.py
 EOF
 

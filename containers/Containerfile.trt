@@ -6,6 +6,8 @@ ARG UNAME=trt
 RUN apt-get update -y \
     && apt-get install -y ccache curl wget jq sudo
 RUN useradd --uid 2000 --gid 0 ${UNAME}
+RUN echo 'ALL ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
 # Switch to the custom user
 USER ${UNAME}
 WORKDIR /home/${UNAME}
