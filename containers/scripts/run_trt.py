@@ -84,7 +84,7 @@ def parse_arguments():
                         default="librispeech_dummy_benchmark")
 
     #parser.add_argument('--batch_size', type=int, default=4)
-    parser.add_argument("--batch_size", type=int, nargs='+', default=[1, 2, 4, 8, 16, 32, 64, 128, 256, 512], help="List of batch sizes to test")
+    parser.add_argument("--batch_size", type=int, nargs='+', default=[1, 2, 4, 8, 16, 32, 64], help="List of batch sizes to test")
 
     parser.add_argument('--num_beams', type=int, default=1)
     parser.add_argument('--debug', action='store_true')

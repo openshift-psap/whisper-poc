@@ -186,8 +186,13 @@ whisper_commands_to_run:
   - mkdir -p /tmp/output/
   - nvidia-smi > /tmp/output/gpu_status.txt
   - source /home/trt/scripts/trt-whisper-vars.sh && bash /home/trt/scripts/trt-build-whisper.sh -m small
-  - source /home/trt/scripts/trt-whisper-vars.sh && python3 /home/trt/scripts/run_trt.py --engine_dir $OUTPUT_DIR --dataset hf-internal-testing/librispeech_asr_dummy --enable_warmup --name librispeech_dummy_large_v3 --assets_dir ~/assets  --num_beams ${MAX_BEAM_WIDTH}
-  - python /home/trt/scripts/scripts/run_vllm_plot.py
+  - source /home/trt/scripts/trt-whisper-vars.sh && python3 /home/trt/scripts/run_trt.py --engine_dir $OUTPUT_DIR \
+            --dataset hf-internal-testing/librispeech_asr_dummy \
+            --enable_warmup \
+            --name librispeech_dummy_large_v3 \
+            --assets_dir ~/assets \
+            --num_beams ${MAX_BEAM_WIDTH}
+  - python3 /home/trt/scripts/run_vllm_plot.py
 EOF
 
 # Running from the Ansible CLI
