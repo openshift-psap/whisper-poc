@@ -1,4 +1,4 @@
-# The toolbox will require this
+# The toolbox will require this, a role called tests where we execute a tasks file with the test.
 # ---
 # - hosts: localhost
 #   name: Deploy the vLLM pod and benchmark whisper while gathering dcgm metrics and render some usage plots

@@ -1,7 +1,7 @@
 
 This repository aims to guide the deployment and
 testing of multimodal whisper models on both
-vLLM and TensorRT.
+vLLM and TensorRT, [docs](https://openshift-psap.github.io/whisper-poc/).
 
 ## Container builds
 
