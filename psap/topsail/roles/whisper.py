@@ -21,7 +21,8 @@ class Whisper:
                     commands_to_run = [
                         "mkdir -p /tmp/output/",
                         "nvidia-smi > /tmp/output/gpu_status.txt",
-                        "python /workspace/scripts/run_vllm.py > /tmp/output/whisper.txt"
+                        "python /workspace/scripts/run_vllm.py --model large-v3 > /tmp/run_vllm.log 2>&1",
+                        "python /workspace/scripts/run_vllm_plot.py"
                     ],
                     results_folder_path = "/tmp/output",
                     output_folder_path = "./whisper_bench-output",

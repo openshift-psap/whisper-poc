@@ -218,5 +218,63 @@ ara-manage generate ./ara-output
 
 [Documentation site](https://openshift-psap.github.io/whisper-poc/)
 
+## Running this PoC for the first time?
 
-python3 /home/trt/scripts/run_trt.py --engine_dir $OUTPUT_DIR --dataset hf-internal-testing/librispeech_asr_dummy --enable_warmup --name librispeech_dummy_large_v3 --assets_dir ~/assets  --num_beams ${MAX_BEAM_WIDTH}
+The following steps will allow you to test this PoC.
+
+### Clone the repository
+
+```
+git clone https://github.com/openshift-psap/whisper-poc
+```
+
+### Install the python dependencies
+
+```
+cd whisper-poc/psap/topsail
+python3 -m pip install -r requirements.txt
+```
+
+### Install the collection dependencies
+
+```
+ansible-galaxy install -r requirements.yml
+```
+
+### Install TOPSAIL as an Ansible collection
+
+```
+ansible-galaxy collection build --force --output-path releases/
+VERSION=$(grep '^version: ' ./galaxy.yml | awk '{print $2}')
+ansible-galaxy collection install releases/psap-topsail-$VERSION.tar.gz --force
+```
+
+### Export your kubeconfig file
+
+```
+export KUBECONFIG=<the path to my kubeconfig>
+```
+
+### Run the playbook
+
+This wil run the whisper PoC on with less resources in a Nvidia T4
+
+```
+# Create a file with the extra vars
+VARS_FILE="./vars.yml"
+
+# Use small or large-v3
+# TODO: the variables passed to the CLI should be fetched from the env vars if configured
+
+cat <<EOF > $VARS_FILE
+whisper_image: quay.io/psap/whisper-poc:latest-vllm
+whisper_commands_to_run:
+  - mkdir -p /tmp/output/
+  - nvidia-smi > /tmp/output/gpu_status.txt
+  - python /workspace/scripts/run_vllm.py --model small --range 100 > /tmp/output/whisper.txt
+  - python3 /home/trt/scripts/run_vllm_plot.py
+EOF
+
+# Running from the Ansible CLI
+ansible-playbook playbook_whisper.yml -e @$VARS_FILE
+```

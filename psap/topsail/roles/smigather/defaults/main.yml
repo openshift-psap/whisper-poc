@@ -13,7 +13,7 @@ smigather_dcgm_pod_label: nvidia-dcgm-exporter
 smigather_container_name_suffix: nvidia-dcgm-exporter
 
 # the interval for retrieving data from the dcgm exported container
-smigather_monitor_interval: 1
+smigather_monitor_interval: 10
 
 # the output file when retrieving data from the dcgm container
 smigather_container_output_file: /tmp/gpu_metrics.csv

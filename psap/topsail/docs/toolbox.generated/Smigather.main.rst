@@ -43,7 +43,7 @@ Parameters
 
 * The interval for retrieving data from the dcgm exported container
 
-* default value: ``1``
+* default value: ``10``
 
 
 ``container_output_file``  

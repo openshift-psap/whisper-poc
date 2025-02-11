@@ -50,7 +50,7 @@ Parameters
 
 * The benchmark's commands to run
 
-* default value: ``['mkdir -p /tmp/output/', 'nvidia-smi > /tmp/output/gpu_status.txt', 'python /workspace/scripts/run_vllm.py > /tmp/output/whisper.txt']``
+* default value: ``['mkdir -p /tmp/output/', 'nvidia-smi > /tmp/output/gpu_status.txt', 'python /workspace/scripts/run_vllm.py --model large-v3 > /tmp/run_vllm.log 2>&1', 'python /workspace/scripts/run_vllm_plot.py']``
 
 
 ``results_folder_path``  
