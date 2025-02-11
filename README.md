@@ -271,20 +271,39 @@ whisper_image: quay.io/psap/whisper-poc:latest-vllm
 whisper_commands_to_run:
   - mkdir -p /tmp/output/
   - nvidia-smi > /tmp/output/gpu_status.txt
-  - python /workspace/scripts/run_vllm.py --model small --range 100 --batch_sizes 1 2 4 8 16 32 > /tmp/output/whisper.txt
-  - python3 /home/trt/scripts/run_vllm_plot.py
+  - python /workspace/scripts/run_vllm.py --model small --range 100 --batch_sizes 1 2 4 8 16 32 > /tmp/run_vllm.log 2>&1
+  - python /workspace/scripts/run_vllm_plot.py
 EOF
 
 # Running from the Ansible CLI
 ansible-playbook playbook_whisper.yml -e @$VARS_FILE
 ```
 
-### 7. Verify results
+### 7. Verifying results
 
-The results by default are stored in the `whisper_bench-output`.
-This structure is subject to change.
+The results are stored by default in the `./whisper_bench-output` folder.
+This structure and the results files are subject to change.
 
 ```
+user@machine:~/dev/whisper-poc/psap/topsail/whisper_bench-output$ tree
+.
+├── gpu_metrics.csv
+├── gpu_status.txt
+├── images
+│   ├── gpu_utilization_plot.png
+│   ├── memory_utilization_plot.png
+│   ├── power_draw_plot.png
+│   ├── vllm-latency.png
+│   ├── vllm-seconds_transcribed_per_sec.png
+│   └── vllm-total_time.png
+├── output-vllm-001.json
+├── output-vllm-002.json
+├── output-vllm-004.json
+├── output-vllm-008.json
+├── output-vllm-016.json
+└── output-vllm-032.json
+
+1 directory, 14 files
 ```
 
 ### 8. HTML output
@@ -295,4 +314,6 @@ If you need an HTML of the execution, by default it is installed ara as a callba
 ara-manage generate ./ara-output
 ```
 
-And inspect the output of the `ara-output` folder (open the `index.html` file).
+And inspect the output of the `ara-output` folder (open the `index.html` file),
+for more information about how to configure this callback plugin read the
+[Logging section](https://github.com/openshift-psap/whisper-poc/blob/main/README.md#logging).
