@@ -222,26 +222,26 @@ ara-manage generate ./ara-output
 
 The following steps will allow you to test this PoC.
 
-### Clone the repository
+### 1. Clone the repository
 
 ```
 git clone https://github.com/openshift-psap/whisper-poc
 ```
 
-### Install the python dependencies
+### 2. Install the python dependencies
 
 ```
 cd whisper-poc/psap/topsail
 python3 -m pip install -r requirements.txt
 ```
 
-### Install the collection dependencies
+### 3. Install the collection dependencies
 
 ```
 ansible-galaxy install -r requirements.yml
 ```
 
-### Install TOPSAIL as an Ansible collection
+### 4. Install TOPSAIL as an Ansible collection
 
 ```
 ansible-galaxy collection build --force --output-path releases/
@@ -249,13 +249,13 @@ VERSION=$(grep '^version: ' ./galaxy.yml | awk '{print $2}')
 ansible-galaxy collection install releases/psap-topsail-$VERSION.tar.gz --force
 ```
 
-### Export your kubeconfig file
+### 5. Export your kubeconfig file
 
 ```
 export KUBECONFIG=<the path to my kubeconfig>
 ```
 
-### Run the playbook
+### 6. Run the playbook
 
 This wil run the whisper PoC on with less resources in a Nvidia T4
 
@@ -271,10 +271,28 @@ whisper_image: quay.io/psap/whisper-poc:latest-vllm
 whisper_commands_to_run:
   - mkdir -p /tmp/output/
   - nvidia-smi > /tmp/output/gpu_status.txt
-  - python /workspace/scripts/run_vllm.py --model small --range 100 > /tmp/output/whisper.txt
+  - python /workspace/scripts/run_vllm.py --model small --range 100 --batch_sizes 1 2 4 8 16 32 > /tmp/output/whisper.txt
   - python3 /home/trt/scripts/run_vllm_plot.py
 EOF
 
 # Running from the Ansible CLI
 ansible-playbook playbook_whisper.yml -e @$VARS_FILE
 ```
+
+### 7. Verify results
+
+The results by default are stored in the `whisper_bench-output`.
+This structure is subject to change.
+
+```
+```
+
+### 8. HTML output
+
+If you need an HTML of the execution, by default it is installed ara as a callback plugin.
+
+```
+ara-manage generate ./ara-output
+```
+
+And inspect the output of the `ara-output` folder (open the `index.html` file).

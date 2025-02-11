@@ -5,23 +5,21 @@ import json
 import os
 import argparse
 
-# Parse arguments
 parser = argparse.ArgumentParser(description="Process only the model name and range.")
 parser.add_argument('--model', type=str, required=True, help='Specify the model')
 parser.add_argument('--range', type=int, default=None, help='Specify the data subset range (optional)')
+parser.add_argument('--batch_sizes', type=int, nargs='+', default=[1, 2, 4, 8, 16, 32, 64, 128, 256, 512], help='Specify batch sizes (optional)')
 args = parser.parse_args()
 
-# Load and filter the dataset
 dataset = load_dataset("MLCommons/peoples_speech", "validation")
 dataset = dataset.filter(lambda example: 10000 < example['duration_ms'] < 30000)
 
-# Apply range selection if provided
 data_subset = dataset["validation"].select(range(args.range)) if args.range else dataset["validation"]
 
 temperature = 0
 top_p = 1.0
 max_tokens = 200
-concurrency_levels = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+concurrency_levels = args.batch_sizes
 
 sampling_params = SamplingParams(
     temperature=temperature,
