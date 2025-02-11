@@ -223,6 +223,8 @@ ara-manage generate ./ara-output
 ## Running this PoC for the first time?
 
 The following steps will allow you to test this PoC.
+The only external requirement is the OpenShift (oc)
+command line interface.
 
 ### 1. Clone the repository
 
