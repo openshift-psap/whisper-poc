@@ -1,0 +1,39 @@
+FROM nvcr.io/nvidia/tritonserver:24.12-trtllm-python-py3 AS base
+
+ARG UNAME=trt
+
+## Install packages required for bench
+RUN apt-get update -y \
+    && apt-get install -y ccache curl wget jq sudo
+RUN useradd --uid 2000 --gid 0 ${UNAME}
+RUN echo 'ALL ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+# Switch to the custom user
+USER ${UNAME}
+WORKDIR /home/${UNAME}
+RUN pip3 install -U transformers
+RUN git clone https://github.com/triton-inference-server/tensorrtllm_backend.git && \
+    git lfs install
+WORKDIR /home/${UNAME}/tensorrtllm_backend
+RUN git checkout v0.16.0 && \
+    git submodule update --init --recursive
+
+#RUN pip install -r tensorrt_llm/examples/whisper/requirements.txt && \
+#    pip install -r requirements.txt
+# If you pip install using the above requirements file, pip crashes trying to re-install dependencies of the already installed tensorrt_llm v0.16
+
+RUN pip install tiktoken datasets kaldialign openai-whisper librosa soundfile safetensors transformers janus regex fire tritonclient pandas tabulate
+
+WORKDIR /home/${UNAME}
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+RUN wget -nc --directory-prefix=assets https://raw.githubusercontent.com/openai/whisper/main/whisper/assets/multilingual.tiktoken
+RUN wget -nc --directory-prefix=assets https://raw.githubusercontent.com/openai/whisper/main/whisper/assets/mel_filters.npz
+RUN wget -nc --directory-prefix=assets https://raw.githubusercontent.com/yuekaizhang/Triton-ASR-Client/main/datasets/mini_en/wav/1221-135766-0002.wav
+RUN wget -nc --directory-prefix=assets https://openaipublic.azureedge.net/main/whisper/models/e5b1a55b89c1367dacf97e3e19bfd829a01529dbfdeefa8caeb59b3f1b81dadb/large-v3.pt
+
+COPY --chown=${UNAME}  ./scripts ./scripts
+
+ENTRYPOINT ["/bin/bash"]
