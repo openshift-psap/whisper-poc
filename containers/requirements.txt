@@ -3,3 +3,4 @@ librosa
 soundfile
 plotly
 kaleido
+jiwer

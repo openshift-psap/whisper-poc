@@ -1,45 +1,12 @@
 #! /bin/bash
 set -ex
 
-usage() {
-    echo "Usage: $0 -m <model_name>"
-    exit 1
-}
-MODEL_NAME=""
-while getopts "m:" opt; do
-    case "$opt" in
-        m) MODEL_NAME="$OPTARG" ;;
-        *) usage ;;
-    esac
-done
-
-if [ -z "$MODEL_NAME" ]; then
-    echo "Error: -m <model> parameter is required"
-    usage
-fi
-
-echo "Model: $MODEL_NAME"
-
-# Steps mostly from https://github.com/triton-inference-server/tensorrtllm_backend/blob/v0.16.0/docs/whisper.md
-# with minor fixes to paths
-
-echo "Getting models and dependencies"
-wget -nc --directory-prefix=assets https://raw.githubusercontent.com/openai/whisper/main/whisper/assets/multilingual.tiktoken
-wget -nc --directory-prefix=assets https://raw.githubusercontent.com/openai/whisper/main/whisper/assets/mel_filters.npz
-wget -nc --directory-prefix=assets https://raw.githubusercontent.com/yuekaizhang/Triton-ASR-Client/main/datasets/mini_en/wav/1221-135766-0002.wav
-# take large-v3 model as an example
-wget -nc --directory-prefix=assets https://openaipublic.azureedge.net/main/whisper/models/e5b1a55b89c1367dacf97e3e19bfd829a01529dbfdeefa8caeb59b3f1b81dadb/large-v3.pt
-# small
-wget -nc --directory-prefix=assets https://openaipublic.azureedge.net/main/whisper/models/9ecf779972d90ba49c06d968637d720dd632c55bbf19d441fb42bf17a411e794/small.pt
-
 source ~/scripts/trt-whisper-vars.sh
 cd ~/tensorrtllm_backend/tensorrt_llm/examples/whisper/
 
 echo "Converting the checkpoints"
 python3 convert_checkpoint.py --model_dir ${MODEL_DIR} \
                               --output_dir ${OUTPUT_DIR} \
-                              --use_weight_only \
-                              --weight_only_precision $WEIGHT_ONLY_PRECISION \
                               --model_name ${MODEL_NAME}
 
 echo "Building the encoder"
@@ -47,8 +14,11 @@ echo "Building the encoder"
 trtllm-build --checkpoint_dir ${OUTPUT_DIR}/encoder \
              --output_dir ${OUTPUT_DIR}/encoder \
              --max_batch_size ${MAX_BATCH_SIZE} \
+             --bert_attention_plugin ${INFERENCE_PRECISION} \
+             --gemm_plugin disable \
+             --max_input_len ${MAX_ENCODER_INPUT_LEN} \
              --max_seq_len ${MAX_ENCODER_SEQ_LEN} \
-             --max_input_len ${MAX_ENCODER_INPUT_LEN}
+             --log_level error
 
 echo "Building the decoder"
 # Decoder build
@@ -58,7 +28,11 @@ trtllm-build --checkpoint_dir ${OUTPUT_DIR}/decoder \
              --max_batch_size ${MAX_BATCH_SIZE} \
              --max_seq_len ${MAX_DECODER_SEQ_LEN} \
              --max_input_len ${MAX_DECODER_INPUT_LEN} \
-             --max_encoder_input_len ${MAX_ENCODER_INPUT_LEN}
+             --max_encoder_input_len ${MAX_ENCODER_INPUT_LEN} \
+             --gemm_plugin ${INFERENCE_PRECISION} \
+             --bert_attention_plugin ${INFERENCE_PRECISION} \
+             --gpt_attention_plugin ${INFERENCE_PRECISION} \
+             --log_level error
 
 cd ~/tensorrtllm_backend
 cp all_models/whisper/ model_repo_whisper -r

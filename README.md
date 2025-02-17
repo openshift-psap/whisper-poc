@@ -79,9 +79,10 @@ Connect to the TensorRT-LLM container with
 oc exec -n my-whisper-runtime -it trt-standalone -- /bin/bash
 ```
 
-In the container, build the model:
+In the container, download and build the model:
 
 ```
+bash scripts/trt-download-whisper.sh 
 bash scripts/trt-build-whisper.sh
 ```
 
