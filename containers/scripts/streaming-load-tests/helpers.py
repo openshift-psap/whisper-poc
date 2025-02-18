@@ -42,7 +42,10 @@ def process_results(results):
         print(f"ref: {ref}, out: {out}")
         
         ttft = decode_times[0]
-        mean_itl = mean(decode_times)
+        if len(decode_times) < 2:
+            mean_itl = ttft
+        else:
+            mean_itl = mean(decode_times[1:])
         
         start_time = req_results["start"]
         end_time = req_results["end"]
