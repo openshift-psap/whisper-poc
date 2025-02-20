@@ -72,7 +72,7 @@ async def transcribe(
             "outputs": outputs,
             "request_id": str(sequence_id)
         }
-
+    print(f"transcribe {task_name}")
     results = []
     start = time.perf_counter()
     async for response in triton_client.stream_infer(
@@ -156,4 +156,4 @@ async def process_dataset(
 
 if __name__ == "__main__":
     dataset = load_hf_dataset(DATASET_NAME)
-    wer = run_evaluation(dataset, CONCURRENT_REQUESTS, process_dataset, n_examples=256)
+    wer = run_evaluation(dataset, CONCURRENT_REQUESTS, process_dataset)
