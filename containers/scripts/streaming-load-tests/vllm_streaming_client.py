@@ -44,9 +44,6 @@ async def transcribe(base_url: str,
                      reference: str):
 
     start = time.perf_counter()
-
-    await asyncio.sleep(2)
-
     async with aiohttp.ClientSession(trust_env=True,
                                      timeout=AIOHTTP_TIMEOUT) as session:
         url = f"{base_url}/generate_from_waveform"
@@ -96,4 +93,4 @@ async def process_dataset(
 
 if __name__ == "__main__":    
     dataset = load_hf_dataset(DATASET_NAME)
-    wer = run_evaluation(dataset, CONCURRENT_REQUESTS, process_dataset, n_examples=16)
+    wer = run_evaluation(dataset, CONCURRENT_REQUESTS, process_dataset)
