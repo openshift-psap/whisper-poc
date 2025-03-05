@@ -1,0 +1,15 @@
+
+playbook task whisper
+~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: /playbook_whisper.svg
+  :width: 400
+  :alt: Alternative text
+
+playbook task plotter
+~~~~~~~~~~~~~~~~~~~~~
+
+.. image:: /playbook_plotter.svg
+  :width: 400
+  :alt: Alternative text
+
