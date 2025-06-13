@@ -74,10 +74,19 @@ def output_file_name(concurrency):
     return(script.split('.')[0] + "-c" + str(concurrency))
 
 def dump_performance_metrics(results, total_time, wer_score, concurrency, output_dir):
+    # ignore first concurrency results
+    results = results[concurrency:]
+    start_times = [res["start_time"] for res in results]
+    start = min(start_times)
+    end_times = [res["end_time"] for res in results]
+    end = max(end_times)
+    total_time = end - start
     ttfts = [res["ttft"] for res in results]
     ttft_p95 = sorted(ttfts)[int(len(ttfts) * 0.95) - 1]
     decode_times = [tok_time for res in results for tok_time in res["decode_times"] ]
-    itl_p95 = sorted(decode_times)[int(len(decode_times) * 0.95) - 1]
+    mean_itl_per_req = [mean(res["decode_times"]) for res in results]
+    #itl_p95 = sorted(decode_times)[int(len(decode_times) * 0.95) - 1]
+    itl_p95 = sorted(mean_itl_per_req)[int(len(mean_itl_per_req) * 0.95) - 1]
     total_tokens = sum([res["num_tokens"] for res in results])
     latencies = [res["latency"] for res in results]
 
@@ -85,7 +94,7 @@ def dump_performance_metrics(results, total_time, wer_score, concurrency, output
     print(f"Total Requests: {total}")
     print(f"Mean TTFT: {mean(ttfts)}")
     print(f"95th Percentile TTFT: {ttft_p95:.4f} ms")
-    print(f"Mean ITL: {mean(decode_times)}")
+    print(f"Mean ITL: {mean(mean_itl_per_req)}")
     print(f"95th Percentile ITL: {itl_p95:.4f} ms")
     print(f"Average Latency: {mean(latencies):.4f} seconds")
 
@@ -120,14 +129,26 @@ def dump_performance_metrics(results, total_time, wer_score, concurrency, output
 
 def load_hf_dataset(dataset_repo: str,
                     split="validation",
+                    max_length=2000,
                     **hf_kwargs):
     ## Load and filter the dataset
-    dataset = load_dataset(dataset_repo,
+ 
+    if "peoples_speech" in dataset_repo:
+        dataset = load_dataset(dataset_repo,
+                           split,
                            split=split,
                            **hf_kwargs)
-    # Whisper max supported duration
-    dataset = dataset.filter(lambda example: example['duration_ms'] < 30000)
+        dataset = dataset.filter(lambda example: 2000 < example['duration_ms'] < 30000)
+        dataset = dataset.shuffle(seed=42)
+        dataset = dataset.select(range(max_length)) if max_length else dataset
 
+    else:
+        dataset = load_dataset(dataset_repo,
+                           split=split,
+                           **hf_kwargs)
+        # Whisper max supported duration
+        dataset = dataset.filter(lambda example: example['duration_ms'] < 30000)
+    
     return dataset
 
 

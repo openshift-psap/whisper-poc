@@ -1,0 +1,9 @@
+FROM registry.redhat.io/rhaiis/vllm-cuda-rhel9:3.0-0-1747403419
+
+USER root
+
+COPY requirements.txt requirements.txt
+
+RUN pip install -r requirements.txt
+
+COPY ./scripts ./scripts
